@@ -13,10 +13,10 @@ CUSTOM_CSS = """
     --muted: #666666;
     --line: rgba(17, 17, 17, 0.12);
     --line-strong: rgba(17, 17, 17, 0.18);
-    --accent: #111111;
-    --success: #111111;
-    --warn: #666666;
-    --danger: #111111;
+    --accent: #2563eb;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
     --soft: #f1f1ef;
     --soft-2: #e8e8e6;
     --radius-lg: 26px;
@@ -174,8 +174,15 @@ button[kind="primaryFormSubmit"] *,
     color: #ffffff !important;
 }
 
+.stProgress > div > div {
+    background: #dde3f0 !important;
+    border-radius: 999px !important;
+    overflow: hidden !important;
+}
+
 .stProgress > div > div > div > div {
-    background: var(--accent);
+    background: var(--accent) !important;
+    border-radius: 999px !important;
 }
 
 .stTabs [data-baseweb="tab"] {
@@ -488,6 +495,177 @@ button[kind="primaryFormSubmit"] *,
     font-size: clamp(1.3rem, 2vw, 1.75rem);
     line-height: 1.05;
     font-weight: 900;
+}
+
+/* Fix expander content contrast */
+[data-testid="stExpander"] {
+    background: var(--panel) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: var(--radius-md) !important;
+    overflow: hidden;
+}
+
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary * {
+    background: var(--panel) !important;
+    color: var(--ink) !important;
+}
+
+[data-testid="stExpander"] > div:last-child {
+    background: var(--panel) !important;
+    color: var(--ink) !important;
+}
+
+[data-testid="stExpander"] > div:last-child * {
+    color: var(--ink) !important;
+}
+
+/* Course list card action buttons */
+.nova-btn-edit button {
+    background: var(--panel) !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+    font-size: 0.82rem !important;
+    padding: 0.3rem 0.7rem !important;
+    font-weight: 700 !important;
+}
+
+.nova-btn-edit button:hover {
+    background: var(--soft) !important;
+    border-color: var(--line-strong) !important;
+}
+
+.nova-btn-delete button {
+    background: #fff1f2 !important;
+    color: var(--danger) !important;
+    border: 1px solid rgba(220, 38, 38, 0.28) !important;
+    border-radius: 10px !important;
+    font-size: 0.82rem !important;
+    padding: 0.3rem 0.7rem !important;
+    font-weight: 700 !important;
+}
+
+.nova-btn-delete button:hover {
+    background: #fee2e2 !important;
+    border-color: var(--danger) !important;
+}
+
+/* Motivational quote card */
+.nova-quote {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+}
+
+.nova-quote .q-text {
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+}
+
+.nova-quote .q-author {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-top: 0.35rem;
+}
+
+/* Estimated hours live display */
+.nova-est-hours {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.nova-est-hours .est-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #3b82f6;
+}
+
+.nova-est-hours .est-value {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #1d4ed8;
+}
+
+.nova-est-hours .est-formula {
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+/* Export page section cards */
+.nova-export-section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 1.2rem 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.nova-export-section h3 {
+    margin-bottom: 0.75rem;
+}
+
+/* Study Mode timer outer card color */
+.nova-timer-wrap {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+/* Customize session card */
+.nova-session-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.nova-session-card .sc-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.nova-session-card .sc-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nova-session-card .sc-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nova-session-card .sc-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
 }
 
 @media (max-width: 900px) {
