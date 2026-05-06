@@ -345,6 +345,33 @@ def get_holidays_detailed(country_code: str, years: Iterable[int]) -> list[dict]
     out.sort(key=lambda x: x["date"])
     return out
 
+_QUOTES_FALLBACK = [
+    ("The secret of getting ahead is getting started.", "Mark Twain"),
+    ("Push yourself, because no one else is going to do it for you.", ""),
+    ("Great things never come from comfort zones.", ""),
+    ("Success is not final, failure is not fatal.", "Winston Churchill"),
+    ("Don't watch the clock; do what it does. Keep going.", "Sam Levenson"),
+    ("The future depends on what you do today.", "Mahatma Gandhi"),
+    ("Hard work beats talent when talent doesn't work hard.", "Tim Notke"),
+]
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_motivational_quote() -> dict:
+    """Fetch a random motivational quote from ZenQuotes."""
+    import random
+    try:
+        r = requests.get("https://zenquotes.io/api/random", timeout=5)
+        if r.ok:
+            data = r.json()
+            if data and isinstance(data, list) and data[0].get("q"):
+                return {"ok": True, "quote": data[0]["q"], "author": data[0].get("a", "")}
+    except Exception:
+        pass
+    q, a = random.choice(_QUOTES_FALLBACK)
+    return {"ok": True, "quote": q, "author": a}
+
+
 _COUNTRY_FALLBACK = [
     ("DE", "Germany"), ("AT", "Austria"), ("CH", "Switzerland"),
     ("PT", "Portugal"), ("ES", "Spain"), ("FR", "France"),
