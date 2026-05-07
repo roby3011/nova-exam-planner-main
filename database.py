@@ -10,6 +10,10 @@ from typing import Optional
 DATA_DIR = Path(__file__).parent / "data"
 DB_PATH = DATA_DIR / "nova.db"
 DEFAULT_COUNTRY = "PT"
+DAY_NAMES_DEFAULT = [
+    "Monday", "Tuesday", "Wednesday", "Thursday",
+    "Friday", "Saturday", "Sunday",
+]
 
 
 def _ensure_dir():
@@ -353,12 +357,6 @@ def clear_user_data(user_id: int):
     with get_connection() as conn:
         conn.execute("DELETE FROM study_sessions WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM courses WHERE user_id = ?", (user_id,))
-
-
-DAY_NAMES_DEFAULT = [
-    "Monday", "Tuesday", "Wednesday", "Thursday",
-    "Friday", "Saturday", "Sunday",
-]
 
 
 def create_user_session(user_id: int, token: str, days: int = 30):
