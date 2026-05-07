@@ -866,39 +866,40 @@ def page_courses(user: dict):
             status_cls = "course-status-normal"
 
         with st.container(border=True):
-            info_col, btn_col = st.columns([0.82, 0.18])
-            with info_col:
+            name_col, edit_col, del_col = st.columns([0.76, 0.135, 0.105])
+            with name_col:
                 st.markdown(
-                    f'<div class="course-card">'
-                    f'  <div class="course-card-name">{h(c["name"])}</div>'
-                    f'  <div class="course-card-chips">'
-                    f'    <span class="course-chip">ECTS {c["ects"]:g}</span>'
-                    f'    <span class="course-chip">Difficulty {c["difficulty"]}/5</span>'
-                    f'    <span class="course-chip">Est. {fmt_hours(c["estimated_hours"])}</span>'
-                    f'  </div>'
-                    f'  <div class="course-exam-row">'
-                    f'    <span class="course-exam-date">Exam: {c["exam_date"]:%d %b %Y}</span>'
-                    f'    <span class="course-status-badge {status_cls}">{h(status_txt)}</span>'
-                    f'  </div>'
-                    f'</div>',
+                    f'<p class="course-card-name">{h(c["name"])}</p>',
                     unsafe_allow_html=True,
                 )
-            with btn_col:
-                b1, b2 = st.columns(2)
-                with b1:
-                    st.markdown('<div class="nova-btn-edit">', unsafe_allow_html=True)
-                    if st.button("Edit", key=f"edit_{c['id']}", use_container_width=True):
-                        st.session_state["editing_course_id"] = c["id"]
-                        st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
-                with b2:
-                    st.markdown('<div class="nova-btn-delete">', unsafe_allow_html=True)
-                    if st.button("✕", key=f"del_{c['id']}", help=f"Delete {c['name']}",
-                                 use_container_width=True):
-                        db.delete_course(user["id"], c["id"])
-                        st.toast(f"Deleted {c['name']}.")
-                        st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
+            with edit_col:
+                st.markdown('<div class="nova-btn-edit">', unsafe_allow_html=True)
+                if st.button("Edit", key=f"edit_{c['id']}", use_container_width=True):
+                    st.session_state["editing_course_id"] = c["id"]
+                    st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            with del_col:
+                st.markdown('<div class="nova-btn-delete">', unsafe_allow_html=True)
+                if st.button("✕", key=f"del_{c['id']}", help=f"Delete {c['name']}",
+                             use_container_width=True):
+                    db.delete_course(user["id"], c["id"])
+                    st.toast(f"Deleted {c['name']}.")
+                    st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="course-meta">'
+                f'ECTS {c["ects"]:g}'
+                f'<span class="course-meta-sep">·</span>'
+                f'Difficulty {c["difficulty"]}/5'
+                f'<span class="course-meta-sep">·</span>'
+                f'Est. {fmt_hours(c["estimated_hours"])}'
+                f'</div>'
+                f'<div class="course-exam-row">'
+                f'  <span class="course-exam-date">{c["exam_date"]:%d %b %Y}</span>'
+                f'  <span class="course-status-badge {status_cls}">{h(status_txt)}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
 
     st.divider()
 

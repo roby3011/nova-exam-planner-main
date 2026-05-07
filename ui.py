@@ -588,108 +588,99 @@ button[kind="primaryFormSubmit"] * {
     color: var(--ink) !important;
 }
 
-/* Course list cards */
-.course-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+/* ── Course cards ─────────────────────────────────── */
+
+/* Tighten internal vertical gap inside border containers */
+[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
+    gap: 0.15rem !important;
 }
 
 .course-card-name {
-    font-size: 1.05rem;
+    font-size: 0.93rem;
     font-weight: 700;
     color: var(--ink);
-    line-height: 1.2;
+    line-height: 1.3;
+    margin: 0;
+    padding-top: 0.05rem;
 }
 
-.course-card-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    align-items: center;
-}
-
-.course-chip {
-    display: inline-block;
-    background: var(--soft);
+.course-meta {
+    font-size: 0.74rem;
     color: var(--muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.2rem 0.55rem;
-    border-radius: 20px;
-    letter-spacing: 0.01em;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.course-meta-sep {
+    display: inline-block;
+    margin: 0 0.3rem;
+    opacity: 0.3;
 }
 
 .course-exam-row {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.45rem;
     margin-top: 0.1rem;
 }
 
 .course-exam-date {
-    font-size: 0.82rem;
+    font-size: 0.74rem;
     font-weight: 600;
     color: var(--ink);
 }
 
 .course-status-badge {
     display: inline-block;
-    font-size: 0.75rem;
+    font-size: 0.64rem;
     font-weight: 700;
-    padding: 0.18rem 0.55rem;
-    border-radius: 20px;
+    padding: 0.1rem 0.42rem;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
 }
 
-.course-status-past {
-    background: var(--soft-2);
-    color: var(--muted);
-}
-
-.course-status-urgent {
-    background: #fff3cd;
-    color: #92400e;
-}
-
-.course-status-soon {
-    background: #eff6ff;
-    color: var(--accent);
-}
-
-.course-status-normal {
-    background: var(--soft);
-    color: var(--muted);
-}
+.course-status-past   { background: var(--soft-2); color: var(--muted); }
+.course-status-urgent { background: #fef3c7; color: #92400e; }
+.course-status-soon   { background: #dbeafe; color: #1d4ed8; }
+.course-status-normal { background: var(--soft); color: var(--muted); }
 
 /* Course card action buttons */
 .nova-btn-edit button {
-    background: var(--panel) !important;
-    color: var(--ink) !important;
+    background: transparent !important;
+    color: var(--muted) !important;
     border: 1px solid var(--line) !important;
-    border-radius: 10px !important;
-    font-size: 0.82rem !important;
-    padding: 0.3rem 0.7rem !important;
-    font-weight: 700 !important;
+    border-radius: 8px !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    padding: 0 0.6rem !important;
+    height: 28px !important;
+    min-height: unset !important;
 }
 
 .nova-btn-edit button:hover {
     background: var(--soft) !important;
+    color: var(--ink) !important;
     border-color: var(--line-strong) !important;
 }
 
 .nova-btn-delete button {
-    background: #fff1f2 !important;
-    color: var(--danger) !important;
-    border: 1px solid rgba(220, 38, 38, 0.28) !important;
-    border-radius: 10px !important;
+    background: transparent !important;
+    color: var(--muted) !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
     font-size: 0.82rem !important;
-    padding: 0.3rem 0.7rem !important;
-    font-weight: 700 !important;
+    font-weight: 400 !important;
+    padding: 0 0.45rem !important;
+    height: 28px !important;
+    min-height: unset !important;
 }
 
 .nova-btn-delete button:hover {
-    background: #fee2e2 !important;
-    border-color: var(--danger) !important;
+    background: #fff1f2 !important;
+    color: var(--danger) !important;
+    border-color: rgba(220, 38, 38, 0.18) !important;
 }
 
 /* Motivational quote card */
