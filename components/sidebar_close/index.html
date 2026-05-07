@@ -5,17 +5,23 @@
 <script>
 (function () {
   if (window.parent.innerWidth >= 768) return;
+
   function tryClose(attempts) {
-    var s = window.parent.document.querySelector('[data-testid="stSidebar"]');
-    if (!s) return;
-    var expanded = s.getAttribute('aria-expanded');
-    if (expanded === 'false') return;
     var b = window.parent.document.querySelector('[data-testid="stSidebarCollapseButton"]')
-         || s.querySelector('button');
-    if (b) { b.click(); return; }
-    if (attempts > 0) setTimeout(function () { tryClose(attempts - 1); }, 100);
+         || window.parent.document.querySelector('[data-testid="stSidebar"] button');
+    if (b) {
+      b.click();
+      return;
+    }
+    /* Fallback: Escape key closes most overlay panels */
+    window.parent.document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27,
+                                     bubbles: true, cancelable: true })
+    );
+    if (attempts > 0) setTimeout(function () { tryClose(attempts - 1); }, 200);
   }
-  setTimeout(function () { tryClose(5); }, 100);
+
+  setTimeout(function () { tryClose(6); }, 300);
 })();
 </script>
 </body>
