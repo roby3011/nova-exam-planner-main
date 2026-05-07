@@ -588,7 +588,80 @@ button[kind="primaryFormSubmit"] * {
     color: var(--ink) !important;
 }
 
-/* Course list card action buttons */
+/* Course list cards */
+.course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.course-card-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+}
+
+.course-card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.course-chip {
+    display: inline-block;
+    background: var(--soft);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    letter-spacing: 0.01em;
+}
+
+.course-exam-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.1rem;
+}
+
+.course-exam-date {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.course-status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.18rem 0.55rem;
+    border-radius: 20px;
+}
+
+.course-status-past {
+    background: var(--soft-2);
+    color: var(--muted);
+}
+
+.course-status-urgent {
+    background: #fff3cd;
+    color: #92400e;
+}
+
+.course-status-soon {
+    background: #eff6ff;
+    color: var(--accent);
+}
+
+.course-status-normal {
+    background: var(--soft);
+    color: var(--muted);
+}
+
+/* Course card action buttons */
 .nova-btn-edit button {
     background: var(--panel) !important;
     color: var(--ink) !important;

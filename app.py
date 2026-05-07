@@ -855,42 +855,51 @@ def page_courses(user: dict):
         days_until = (c["exam_date"] - dt.date.today()).days
         if days_until < 0:
             status_txt = "Past"
-            status_color = "var(--muted)"
+            status_cls = "course-status-past"
         elif days_until <= 7:
             status_txt = f"⚠ {days_until}d left"
-            status_color = "var(--warn)"
+            status_cls = "course-status-urgent"
         elif days_until <= 21:
             status_txt = f"{days_until}d left"
-            status_color = "var(--ink)"
+            status_cls = "course-status-soon"
         else:
             status_txt = f"{days_until}d left"
-            status_color = "var(--muted)"
+            status_cls = "course-status-normal"
 
         with st.container(border=True):
-            cols = st.columns([0.28, 0.09, 0.09, 0.15, 0.13, 0.13, 0.07, 0.06])
-            cols[0].markdown(f"**{h(c['name'])}**", unsafe_allow_html=False)
-            cols[1].caption(f"ECTS {c['ects']:g}")
-            cols[2].caption(f"Diff {c['difficulty']}/5")
-            cols[3].caption(f"Est. {fmt_hours(c['estimated_hours'])}")
-            cols[4].caption(f"Exam: {c['exam_date']:%d %b %Y}")
-            cols[5].markdown(
-                f'<span style="font-size:0.82rem;color:{status_color};">'
-                f'{h(status_txt)}</span>',
-                unsafe_allow_html=True)
-            with cols[6]:
-                st.markdown('<div class="nova-btn-edit">', unsafe_allow_html=True)
-                if st.button("Edit", key=f"edit_{c['id']}", use_container_width=True):
-                    st.session_state["editing_course_id"] = c["id"]
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-            with cols[7]:
-                st.markdown('<div class="nova-btn-delete">', unsafe_allow_html=True)
-                if st.button("✕", key=f"del_{c['id']}", help=f"Delete {c['name']}",
-                             use_container_width=True):
-                    db.delete_course(user["id"], c["id"])
-                    st.toast(f"Deleted {c['name']}.")
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
+            info_col, btn_col = st.columns([0.82, 0.18])
+            with info_col:
+                st.markdown(
+                    f'<div class="course-card">'
+                    f'  <div class="course-card-name">{h(c["name"])}</div>'
+                    f'  <div class="course-card-chips">'
+                    f'    <span class="course-chip">ECTS {c["ects"]:g}</span>'
+                    f'    <span class="course-chip">Difficulty {c["difficulty"]}/5</span>'
+                    f'    <span class="course-chip">Est. {fmt_hours(c["estimated_hours"])}</span>'
+                    f'  </div>'
+                    f'  <div class="course-exam-row">'
+                    f'    <span class="course-exam-date">Exam: {c["exam_date"]:%d %b %Y}</span>'
+                    f'    <span class="course-status-badge {status_cls}">{h(status_txt)}</span>'
+                    f'  </div>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            with btn_col:
+                b1, b2 = st.columns(2)
+                with b1:
+                    st.markdown('<div class="nova-btn-edit">', unsafe_allow_html=True)
+                    if st.button("Edit", key=f"edit_{c['id']}", use_container_width=True):
+                        st.session_state["editing_course_id"] = c["id"]
+                        st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
+                with b2:
+                    st.markdown('<div class="nova-btn-delete">', unsafe_allow_html=True)
+                    if st.button("✕", key=f"del_{c['id']}", help=f"Delete {c['name']}",
+                                 use_container_width=True):
+                        db.delete_course(user["id"], c["id"])
+                        st.toast(f"Deleted {c['name']}.")
+                        st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
 
     st.divider()
 
