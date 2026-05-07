@@ -2056,9 +2056,9 @@ def main():
         streamlit_js_eval(
             js_expressions=(
                 "(function(){"
-                "if(window.innerWidth>=768)return null;"
-                "var b=document.querySelector('[data-testid=\"stSidebarCollapseButton\"]')"
-                "||document.querySelector('[data-testid=\"stSidebar\"] button');"
+                "if(window.parent.innerWidth>=768)return null;"
+                "var b=window.parent.document.querySelector('[data-testid=\"stSidebarCollapseButton\"]')"
+                "||window.parent.document.querySelector('[data-testid=\"stSidebar\"] button');"
                 "if(b)b.click();return null;"
                 "})()"
             ),
