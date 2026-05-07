@@ -1121,7 +1121,7 @@ def page_customize(user: dict):
             unsafe_allow_html=True,
         )
     if all_ok:
-        st.success("All courses are on target.", icon="✓")
+        st.success("All courses are on target.", icon="✅")
 
     st.divider()
 
