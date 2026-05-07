@@ -545,7 +545,7 @@ def _render_quickstart():
             "Build the balanced schedule after courses and limits are ready.",
         ),
     ]
-    with st.container(key="quickstart_actions"):
+    with st.container():
         cols = st.columns(3)
         for idx, (title, body) in enumerate(cards):
             with cols[idx]:
