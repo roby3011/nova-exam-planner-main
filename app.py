@@ -661,29 +661,28 @@ def page_courses(user: dict):
             "Plan start date", con["start_date"])
 
     _pd_all = list(DAY_NAMES)
-    _pd_col1, _pd_col2, _pd_col3 = st.columns([6, 0.55, 0.55])
-    with _pd_col1:
-        st.markdown("**Preferred study days**")
-    with _pd_col2:
-        if st.button("✓", key="days_sel_all", use_container_width=True, help="Select all"):
-            st.session_state["pref_days_pills"] = _pd_all
-            st.rerun()
-    with _pd_col3:
-        if st.button("✕", key="days_sel_none", use_container_width=True, help="Clear all"):
-            st.session_state["pref_days_pills"] = []
-            st.rerun()
-
     if "pref_days_pills" not in st.session_state:
         st.session_state["pref_days_pills"] = con["preferred_days"] or DAY_NAMES
 
-    preferred_days = st.pills(
-        "Preferred study days",
-        DAY_NAMES,
-        default=st.session_state["pref_days_pills"],
-        selection_mode="multi",
-        key="pref_days_pills",
-        label_visibility="collapsed",
-    )
+    _days_all_selected = set(st.session_state.get("pref_days_pills") or []) == set(_pd_all)
+    _days_col, _days_btn = st.columns([11, 0.7], vertical_alignment="bottom")
+    with _days_col:
+        preferred_days = st.pills(
+            "Preferred study days",
+            DAY_NAMES,
+            default=st.session_state["pref_days_pills"],
+            selection_mode="multi",
+            key="pref_days_pills",
+        )
+    with _days_btn:
+        if st.button(
+            "✕" if _days_all_selected else "✓",
+            key="days_toggle",
+            use_container_width=True,
+            help="Clear all" if _days_all_selected else "Select all",
+        ):
+            st.session_state["pref_days_pills"] = [] if _days_all_selected else _pd_all
+            st.rerun()
     if not preferred_days:
         st.warning("Select at least one study day.")
         preferred_days = list(DAY_NAMES)
@@ -1155,25 +1154,24 @@ def page_customize(user: dict):
 
         cf1, cf2 = st.columns(2)
         with cf1:
-            _cc_h1, _cc_h2, _cc_h3 = st.columns([6, 0.55, 0.55])
-            with _cc_h1:
-                st.markdown("**Filter by course**")
-            with _cc_h2:
-                if st.button("✓", key="cust_sel_all", use_container_width=True, help="Select all"):
-                    st.session_state["cust_course_filter"] = list(course_names)
-                    st.rerun()
-            with _cc_h3:
-                if st.button("✕", key="cust_sel_none", use_container_width=True, help="Clear all"):
-                    st.session_state["cust_course_filter"] = []
-                    st.rerun()
-
             if "cust_course_filter" not in st.session_state:
                 st.session_state["cust_course_filter"] = list(course_names)
 
-            sel_courses = st.pills(
-                "Filter by course", course_names, default=course_names,
-                selection_mode="multi", key="cust_course_filter",
-                label_visibility="collapsed")
+            _cc_all_sel = set(st.session_state.get("cust_course_filter") or []) == set(course_names)
+            _cc_col, _cc_btn = st.columns([11, 0.7], vertical_alignment="bottom")
+            with _cc_col:
+                sel_courses = st.pills(
+                    "Filter by course", course_names, default=course_names,
+                    selection_mode="multi", key="cust_course_filter")
+            with _cc_btn:
+                if st.button(
+                    "✕" if _cc_all_sel else "✓",
+                    key="cust_toggle",
+                    use_container_width=True,
+                    help="Clear all" if _cc_all_sel else "Select all",
+                ):
+                    st.session_state["cust_course_filter"] = [] if _cc_all_sel else list(course_names)
+                    st.rerun()
         filtered = sessions_df[sessions_df["course_name"].isin(sel_courses or [])]
 
         with cf2:
