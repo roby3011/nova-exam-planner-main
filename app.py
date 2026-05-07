@@ -660,11 +660,29 @@ def page_courses(user: dict):
         start_date = st.date_input(
             "Plan start date", con["start_date"])
 
+    _pd_all = list(DAY_NAMES)
+    _pd_col1, _pd_col2, _pd_col3 = st.columns([4, 1, 1])
+    with _pd_col1:
+        st.markdown("**Preferred study days**")
+    with _pd_col2:
+        if st.button("All", key="days_sel_all", use_container_width=True):
+            st.session_state["pref_days_pills"] = _pd_all
+            st.rerun()
+    with _pd_col3:
+        if st.button("None", key="days_sel_none", use_container_width=True):
+            st.session_state["pref_days_pills"] = []
+            st.rerun()
+
+    if "pref_days_pills" not in st.session_state:
+        st.session_state["pref_days_pills"] = con["preferred_days"] or DAY_NAMES
+
     preferred_days = st.pills(
         "Preferred study days",
         DAY_NAMES,
-        default=con["preferred_days"] or DAY_NAMES,
+        default=st.session_state["pref_days_pills"],
         selection_mode="multi",
+        key="pref_days_pills",
+        label_visibility="collapsed",
     )
     if not preferred_days:
         st.warning("Select at least one study day.")
@@ -1137,10 +1155,26 @@ def page_customize(user: dict):
 
         cf1, cf2 = st.columns(2)
         with cf1:
+            _cc_h1, _cc_h2, _cc_h3 = st.columns([4, 1, 1])
+            with _cc_h1:
+                st.markdown("**Filter by course**")
+            with _cc_h2:
+                if st.button("All", key="cust_sel_all", use_container_width=True):
+                    st.session_state["cust_course_filter"] = list(course_names)
+                    st.rerun()
+            with _cc_h3:
+                if st.button("None", key="cust_sel_none", use_container_width=True):
+                    st.session_state["cust_course_filter"] = []
+                    st.rerun()
+
+            if "cust_course_filter" not in st.session_state:
+                st.session_state["cust_course_filter"] = list(course_names)
+
             sel_courses = st.pills(
                 "Filter by course", course_names, default=course_names,
-                selection_mode="multi", key="cust_course_filter")
-        filtered = sessions_df[sessions_df["course_name"].isin(sel_courses)]
+                selection_mode="multi", key="cust_course_filter",
+                label_visibility="collapsed")
+        filtered = sessions_df[sessions_df["course_name"].isin(sel_courses or [])]
 
         with cf2:
             if not filtered.empty:
