@@ -68,6 +68,7 @@ div[data-testid="stMetric"] {
     border-radius: var(--radius-md);
     padding: 1rem 1.1rem;
     box-shadow: 0 10px 25px rgba(17, 17, 17, 0.04);
+    min-height: 120px;
 }
 
 code {
