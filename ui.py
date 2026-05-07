@@ -114,24 +114,40 @@ div[role="alert"] svg {
     box-shadow: none !important;
 }
 
-/* ── Border on the OUTER container only, never on the raw <input> ── */
+/* ── Text and date inputs: baseweb input IS the full container ── */
 [data-testid="stTextInput"] [data-baseweb="input"],
-[data-testid="stDateInput"] [data-baseweb="input"],
-[data-testid="stNumberInput"] [data-baseweb="input"] {
+[data-testid="stDateInput"] [data-baseweb="input"] {
     background: #ffffff !important;
     border: 1.5px solid rgba(17,17,17,0.2) !important;
     border-radius: 14px !important;
     overflow: hidden;
 }
 [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
-[data-testid="stDateInput"] [data-baseweb="input"]:focus-within,
-[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
+[data-testid="stDateInput"] [data-baseweb="input"]:focus-within {
     border-color: rgba(17,17,17,0.32) !important;
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
     outline: none !important;
 }
 
-/* Number input ± step buttons — no separate border */
+/* ── Number inputs: CSS best-effort via :has() (direct-child variant) ──
+   JS in apply_theme() is the reliable fallback. */
+[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]) {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
+[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]) > [data-baseweb="input"] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]):focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
+}
+
+/* Number input ± step buttons */
 [data-testid="stNumberInput"] button {
     background: transparent !important;
     border: none !important;
@@ -750,8 +766,44 @@ button[kind="primaryFormSubmit"] *,
 """
 
 
+_NUMBER_INPUT_JS = """
+<script>
+(function(){
+  var BORDER = '1.5px solid rgba(17,17,17,0.2)';
+  var RADIUS = '14px';
+  function fix(){
+    try {
+      var doc = window.parent.document;
+      doc.querySelectorAll('[data-testid="stNumberInput"]').forEach(function(widget){
+        var bwInput = widget.querySelector('[data-baseweb="input"]');
+        if (!bwInput) return;
+        var container = bwInput.parentElement;
+        // Walk up if the immediate parent is also a baseweb element
+        if (!container || container === widget) return;
+        if (container.style.border === BORDER) return; // already done
+        container.style.cssText += [
+          'border:' + BORDER,
+          'border-radius:' + RADIUS,
+          'overflow:hidden',
+          'background:#ffffff'
+        ].join('!important;') + '!important;';
+        bwInput.style.cssText += 'border:none!important;background:transparent!important;border-radius:0!important;';
+      });
+    } catch(e){}
+  }
+  fix();
+  try {
+    new MutationObserver(fix)
+      .observe(window.parent.document.body, {childList:true, subtree:true});
+  } catch(e){}
+})();
+</script>
+"""
+
+
 def apply_theme():
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+    st.components.v1.html(_NUMBER_INPUT_JS, height=0)
 
 
 def fmt_minutes(minutes: float) -> str:
