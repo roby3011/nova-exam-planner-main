@@ -377,9 +377,8 @@ button[kind="primaryFormSubmit"] * {
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
-    min-height: 2.35rem;
     border-bottom: 1px solid var(--line);
-    padding: 0.3rem 0;
+    padding: 0.55rem 0;
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] label > div:first-child {
@@ -389,14 +388,15 @@ button[kind="primaryFormSubmit"] * {
 [data-testid="stSidebar"] [data-testid="stRadio"] label p {
     color: var(--ink) !important;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 600;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+    border-bottom: 2px solid var(--ink);
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) p {
     font-weight: 900;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.25rem;
 }
 
 .nova-task {
