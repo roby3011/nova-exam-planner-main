@@ -686,39 +686,39 @@ button[kind="primaryFormSubmit"] *,
 _MULTISELECT_FIX_JS = """
 <script>
 (function() {
-  function fix() {
-    var doc = window.parent ? window.parent.document : document;
-    doc.querySelectorAll('[data-testid="stMultiSelect"]').forEach(function(ms) {
-      // Walk every div descendant and allow wrapping / visible overflow
-      ms.querySelectorAll('div').forEach(function(d) {
-        d.style.setProperty('overflow', 'visible', 'important');
-        d.style.setProperty('height', 'auto', 'important');
-        if (getComputedStyle(d).display === 'flex') {
-          d.style.setProperty('flex-wrap', 'wrap', 'important');
-        }
-      });
-      // Move the search input out of flow and make it invisible
-      var inp = ms.querySelector('input[type="text"]');
-      if (inp && inp.parentNode) {
-        inp.parentNode.appendChild(inp);
-        inp.style.setProperty('position', 'absolute', 'important');
-        inp.style.setProperty('opacity', '0', 'important');
-        inp.style.setProperty('width', '1px', 'important');
-        inp.style.setProperty('height', '1px', 'important');
-        inp.style.setProperty('min-width', '0', 'important');
-        inp.style.setProperty('padding', '0', 'important');
-        inp.style.setProperty('border', 'none', 'important');
-        inp.style.setProperty('outline', 'none', 'important');
-      }
-      // Make sure the first tag has enough left breathing room
-      var firstTag = ms.querySelector('[data-baseweb="tag"]');
-      if (firstTag) firstTag.style.setProperty('margin-left', '6px', 'important');
-    });
-  }
-  fix();
-  var obs = new MutationObserver(fix);
-  obs.observe(window.parent ? window.parent.document.body : document.body,
-              {childList: true, subtree: true});
+  try {
+    var doc = (window.parent || window).document;
+    if (doc.getElementById('nova-ms-fix')) return;
+    var s = doc.createElement('style');
+    s.id = 'nova-ms-fix';
+    s.textContent = [
+      /* chips wrap, no overflow clipping */
+      '[data-testid="stMultiSelect"] [data-baseweb="select"] > div {',
+      '  flex-wrap: wrap !important;',
+      '  height: auto !important;',
+      '  overflow: visible !important;',
+      '}',
+      /* make the search input completely invisible */
+      '[data-testid="stMultiSelect"] input[type="text"] {',
+      '  opacity: 0 !important;',
+      '  position: absolute !important;',
+      '  pointer-events: none !important;',
+      '  width: 1px !important;',
+      '  min-width: 0 !important;',
+      '  height: 1px !important;',
+      '  padding: 0 !important;',
+      '  margin: 0 !important;',
+      '  border: 0 !important;',
+      '  outline: 0 !important;',
+      '  box-shadow: none !important;',
+      '}',
+      /* give Monday a small left margin so rounded corner does not clip it */
+      '[data-testid="stMultiSelect"] [data-baseweb="tag"]:first-child {',
+      '  margin-left: 6px !important;',
+      '}'
+    ].join('\\n');
+    doc.head.appendChild(s);
+  } catch(e) {}
 })();
 </script>
 """
