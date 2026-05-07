@@ -107,7 +107,8 @@ div[role="alert"] svg {
 textarea,
 input {
     background: #ffffff !important;
-    border-color: var(--line) !important;
+    border-color: rgba(17,17,17,0.2) !important;
+    border-width: 1.5px !important;
     border-radius: 14px !important;
     color: var(--ink) !important;
 }
@@ -131,6 +132,21 @@ textarea:focus {
 [data-baseweb="base-input"] {
     background: #ffffff !important;
     border-radius: 14px !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+}
+
+/* Number input ± step buttons */
+[data-baseweb="input"] button,
+.stNumberInput button {
+    background: #ffffff !important;
+    border: none !important;
+    color: var(--ink) !important;
+}
+
+/* Selectbox dropdown arrow container */
+[data-baseweb="select"] > div {
+    border: none !important;
+    background: #ffffff !important;
 }
 
 [data-baseweb="tab-highlight"] {
@@ -679,24 +695,26 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Pills — unselected: subtle outline; selected: solid black */
+/* Pills — uniform 1.5px border on all states */
 [data-testid="stPills"] button {
-    border: 1.5px solid rgba(17,17,17,0.25) !important;
+    border: 1.5px solid rgba(17,17,17,0.35) !important;
     border-radius: 999px !important;
-    background: transparent !important;
+    background: #ffffff !important;
     color: var(--ink) !important;
     font-weight: 500 !important;
     font-size: 0.88rem !important;
-    padding: 4px 14px !important;
+    padding: 4px 16px !important;
     transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    box-shadow: none !important;
 }
 [data-testid="stPills"] button:hover {
     border-color: var(--ink) !important;
-    background: rgba(17,17,17,0.06) !important;
+    background: var(--soft) !important;
 }
 [data-testid="stPills"] button[aria-selected="true"],
 [data-testid="stPills"] button[data-selected="true"],
-[data-testid="stPills"] button[kind="pillsActive"] {
+[data-testid="stPills"] button[kind="pillsActive"],
+[data-testid="stPills"] [aria-pressed="true"] {
     background: var(--ink) !important;
     color: #ffffff !important;
     border-color: var(--ink) !important;
