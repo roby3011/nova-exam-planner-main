@@ -694,14 +694,14 @@ def page_courses(user: dict):
             years = sorted({start_date.year, start_date.year + 1})
             holidays = api.get_holidays_detailed(
                 user["country_code"], years)
-            future = [h for h in holidays if h["date"] >= dt.date.today()][:12]
+            future = [hol for hol in holidays if hol["date"] >= dt.date.today()][:12]
             if not future:
                 st.caption("No upcoming holidays found.")
             else:
-                for h in future:
+                for hol in future:
                     st.markdown(
-                        f"- **{h['date']:%d %b %Y}** - "
-                        f"{h['local_name']} ({h['name']})")
+                        f"- **{hol['date']:%d %b %Y}** - "
+                        f"{hol['local_name']} ({hol['name']})")
 
     st.divider()
 
@@ -745,7 +745,8 @@ def page_courses(user: dict):
         unsafe_allow_html=True,
     )
 
-    with st.form("course_form", clear_on_submit=True):
+    form_ver = st.session_state.get("course_form_version", 0)
+    with st.form(f"course_form_{form_ver}", clear_on_submit=True):
         fc1, fc2 = st.columns(2)
         with fc1:
             name = st.text_input("Course name", defaults["name"])
@@ -811,6 +812,7 @@ def page_courses(user: dict):
                     course_id=editing_id,
                 )
                 st.session_state["editing_course_id"] = None
+                st.session_state["course_form_version"] = form_ver + 1
                 # Reset live-update keys so the form shows fresh defaults
                 for k in (ects_key, diff_key):
                     st.session_state.pop(k, None)
@@ -821,6 +823,7 @@ def page_courses(user: dict):
 
     if editing and st.button("Cancel editing"):
         st.session_state["editing_course_id"] = None
+        st.session_state["course_form_version"] = form_ver + 1
         for k in (ects_key, diff_key):
             st.session_state.pop(k, None)
         st.rerun()
@@ -1433,7 +1436,11 @@ def page_study_mode(user: dict):
         } for c in courses]
 
     labels = [t["label"] for t in targets]
-    selected_label = st.selectbox("What are you studying now?", labels)
+    # Reset stale selection (e.g. after a session's remaining-minutes label changes)
+    if st.session_state.get("study_target_label") not in labels:
+        st.session_state["study_target_label"] = labels[0]
+    selected_label = st.selectbox(
+        "What are you studying now?", labels, key="study_target_label")
     target = targets[labels.index(selected_label)]
 
     st.divider()
