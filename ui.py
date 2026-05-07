@@ -679,11 +679,18 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Prevent multiselect tag container from clipping the first chip */
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div:first-child {
-    flex-wrap: wrap;
+/* Make multiselect tags wrap so the scroll arrows never appear */
+[data-testid="stMultiSelect"] [data-baseweb="select"],
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
+    height: auto !important;
+    min-height: unset !important;
+    flex-wrap: wrap !important;
     overflow: visible !important;
-    padding-left: 6px;
+}
+/* Hide baseweb scroll-left / scroll-right arrow buttons */
+[data-testid="stMultiSelect"] [data-baseweb="select"] button {
+    display: none !important;
 }
 </style>
 """
