@@ -10,7 +10,6 @@ from typing import Optional
 
 import pandas as pd
 import streamlit as st
-from streamlit_js_eval import streamlit_js_eval
 from streamlit_scroll_to_top import scroll_to_here
 
 import database as db
@@ -2048,22 +2047,11 @@ def main():
     apply_pending_page_choice(PAGE_NAMES)
     choice = render_sidebar(user)
 
-    # Scroll to top and close sidebar (mobile) whenever the user navigates to a different page.
+    # Scroll to top whenever the user navigates to a different page.
     prev = st.session_state.get("_prev_page")
     if prev != choice:
         st.session_state["_prev_page"] = choice
         scroll_to_here(0, key=f"scroll_top_{choice}")
-        streamlit_js_eval(
-            js_expressions=(
-                "(function(){"
-                "if(window.parent.innerWidth>=768)return null;"
-                "var b=window.parent.document.querySelector('[data-testid=\"stSidebarCollapseButton\"]')"
-                "||window.parent.document.querySelector('[data-testid=\"stSidebar\"] button');"
-                "if(b)b.click();return null;"
-                "})()"
-            ),
-            key=f"close_sidebar_{choice}",
-        )
 
     render_adaptive_rescheduler(user)
     PAGE_BY_NAME[choice](user)
