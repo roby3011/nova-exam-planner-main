@@ -29,23 +29,28 @@ CUSTOM_CSS = """
     color: var(--ink);
 }
 
+/* Hide header — it was already invisible via background match; hiding removes the space it occupied */
 header[data-testid="stHeader"] {
-    background: var(--paper);
+    display: none !important;
 }
 
-/* Remove Streamlit's default header-height top padding; scroll_to_here aligns to content box */
-section.main {
+/* With no header, collapse all top offsets so content starts flush */
+section.main,
+section[data-testid="stMain"] {
     padding-top: 0 !important;
-    scroll-padding-top: 0.75rem !important;
+    margin-top: 0 !important;
 }
 
+section.main,
+section[data-testid="stMain"],
 [data-testid="stAppViewContainer"] {
     scroll-padding-top: 0.75rem !important;
 }
 
-.main .block-container {
+.main .block-container,
+[data-testid="stMain"] .block-container {
     max-width: 1180px;
-    padding-top: 0.75rem;
+    padding-top: 0.75rem !important;
     padding-bottom: 3rem;
 }
 
