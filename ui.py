@@ -683,6 +683,7 @@ button[kind="primaryFormSubmit"] *,
 [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
     flex-wrap: wrap !important;
     height: auto !important;
+    padding-left: 8px !important;
 }
 /* Push the search input to the end so it never overlaps the first chip */
 [data-testid="stMultiSelect"] input {
