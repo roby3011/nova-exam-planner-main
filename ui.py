@@ -34,20 +34,19 @@ header[data-testid="stHeader"] {
     background: var(--paper);
 }
 
-/* Desktop: collapse header to zero height but keep overflow visible so the
-   sidebar toggle button remains accessible when the sidebar is collapsed */
+/* Desktop: shrink header to 3rem so the sidebar toggle stays accessible,
+   match section.main padding so content sits flush below it */
 @media screen and (min-width: 768px) {
     header[data-testid="stHeader"] {
-        height: 0 !important;
-        min-height: 0 !important;
-        overflow: visible !important;
-        background: transparent !important;
-        border: none !important;
+        height: 3rem !important;
+        min-height: 3rem !important;
+        background: var(--paper) !important;
         box-shadow: none !important;
+        border-bottom: none !important;
     }
     section.main,
     section[data-testid="stMain"] {
-        padding-top: 0 !important;
+        padding-top: 3rem !important;
         margin-top: 0 !important;
     }
 }
