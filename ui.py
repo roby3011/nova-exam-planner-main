@@ -29,16 +29,21 @@ CUSTOM_CSS = """
     color: var(--ink);
 }
 
-/* Hide header — it was already invisible via background match; hiding removes the space it occupied */
+/* Mobile: keep header visible — it holds the sidebar toggle button */
 header[data-testid="stHeader"] {
-    display: none !important;
+    background: var(--paper);
 }
 
-/* With no header, collapse all top offsets so content starts flush */
-section.main,
-section[data-testid="stMain"] {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+/* Desktop: hide the header bar entirely to remove the dead space above content */
+@media screen and (min-width: 768px) {
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    section.main,
+    section[data-testid="stMain"] {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
 }
 
 section.main,
