@@ -34,19 +34,19 @@ header[data-testid="stHeader"] {
     background: var(--paper);
 }
 
-/* Desktop: shrink header to 3rem so the sidebar toggle stays accessible,
+/* Desktop: shrink header to 2rem so the sidebar toggle stays accessible,
    match section.main padding so content sits flush below it */
 @media screen and (min-width: 768px) {
     header[data-testid="stHeader"] {
-        height: 3rem !important;
-        min-height: 3rem !important;
+        height: 2rem !important;
+        min-height: 2rem !important;
         background: var(--paper) !important;
         box-shadow: none !important;
         border-bottom: none !important;
     }
     section.main,
     section[data-testid="stMain"] {
-        padding-top: 3rem !important;
+        padding-top: 2rem !important;
         margin-top: 0 !important;
     }
 }
@@ -54,13 +54,13 @@ header[data-testid="stHeader"] {
 section.main,
 section[data-testid="stMain"],
 [data-testid="stAppViewContainer"] {
-    scroll-padding-top: 0.75rem !important;
+    scroll-padding-top: 2rem !important;
 }
 
 .main .block-container,
 [data-testid="stMain"] .block-container {
     max-width: 1180px;
-    padding-top: 0.75rem !important;
+    padding-top: 0 !important;
     padding-bottom: 3rem;
 }
 
