@@ -86,12 +86,29 @@ def authenticate(username: str, password: str):
     return user
 
 
-def login_session(user: dict):
+def login_session(user: dict) -> str:
+    token = secrets.token_urlsafe(32)
+    db.create_user_session(user["id"], token)
     st.session_state["user_id"] = user["id"]
     st.session_state["username"] = user["username"]
+    st.session_state["_session_token"] = token
+    return token
+
+
+def restore_from_token(token: str) -> bool:
+    user = db.get_user_by_session_token(token)
+    if not user:
+        return False
+    st.session_state["user_id"] = user["id"]
+    st.session_state["username"] = user["username"]
+    st.session_state["_session_token"] = token
+    return True
 
 
 def logout():
+    token = st.session_state.get("_session_token")
+    if token:
+        db.delete_user_session(token)
     for k in list(st.session_state.keys()):
         del st.session_state[k]
 

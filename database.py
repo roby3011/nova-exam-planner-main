@@ -81,10 +81,18 @@ def init_db():
                 FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS user_sessions (
+                token       TEXT PRIMARY KEY,
+                user_id     INTEGER NOT NULL,
+                expires_at  TIMESTAMP NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_courses_user    ON courses(user_id);
             CREATE INDEX IF NOT EXISTS idx_sessions_user   ON study_sessions(user_id);
             CREATE INDEX IF NOT EXISTS idx_sessions_course ON study_sessions(course_id);
             CREATE INDEX IF NOT EXISTS idx_sessions_date   ON study_sessions(session_date);
+            CREATE INDEX IF NOT EXISTS idx_user_sessions   ON user_sessions(user_id);
         """)
 
 
@@ -351,3 +359,28 @@ DAY_NAMES_DEFAULT = [
     "Monday", "Tuesday", "Wednesday", "Thursday",
     "Friday", "Saturday", "Sunday",
 ]
+
+
+def create_user_session(user_id: int, token: str, days: int = 30):
+    expires = (dt.datetime.utcnow() + dt.timedelta(days=days)).isoformat()
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT INTO user_sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+            (token, user_id, expires),
+        )
+
+
+def get_user_by_session_token(token: str) -> Optional[dict]:
+    with get_connection() as conn:
+        row = conn.execute(
+            """SELECT u.* FROM users u
+               JOIN user_sessions s ON s.user_id = u.id
+               WHERE s.token = ? AND s.expires_at > datetime('now')""",
+            (token,),
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def delete_user_session(token: str):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM user_sessions WHERE token = ?", (token,))
