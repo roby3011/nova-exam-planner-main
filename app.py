@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from streamlit_scroll_to_top import scroll_to_here
 import base64
 from collections import defaultdict
 from pathlib import Path
@@ -2041,19 +2042,7 @@ def main():
     prev = st.session_state.get("_prev_page")
     if prev != choice:
         st.session_state["_prev_page"] = choice
-        st.components.v1.html(
-            """<script>
-            function scrollTop() {
-                var el = window.parent.document.querySelector('section.main');
-                if (el) el.scrollTo(0, 0);
-            }
-            scrollTop();
-            setTimeout(scrollTop, 50);
-            setTimeout(scrollTop, 150);
-            setTimeout(scrollTop, 400);
-            </script>""",
-            height=0,
-        )
+        scroll_to_here(0, key=f"scroll_top_{choice}")
 
     render_adaptive_rescheduler(user)
     PAGE_BY_NAME[choice](user)
