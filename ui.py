@@ -590,9 +590,10 @@ button[kind="primaryFormSubmit"] * {
 
 /* ── Course cards ─────────────────────────────────── */
 
-/* Tighten internal vertical gap inside border containers */
-[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
-    gap: 0.15rem !important;
+.course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
 .course-card-name {
@@ -609,6 +610,7 @@ button[kind="primaryFormSubmit"] * {
     color: var(--muted);
     line-height: 1.4;
     margin: 0;
+    padding: 0;
 }
 
 .course-meta-sep {

@@ -866,10 +866,23 @@ def page_courses(user: dict):
             status_cls = "course-status-normal"
 
         with st.container(border=True):
-            name_col, edit_col, del_col = st.columns([0.76, 0.135, 0.105])
-            with name_col:
+            info_col, edit_col, del_col = st.columns([0.76, 0.135, 0.105])
+            with info_col:
                 st.markdown(
-                    f'<p class="course-card-name">{h(c["name"])}</p>',
+                    f'<div class="course-card">'
+                    f'  <p class="course-card-name">{h(c["name"])}</p>'
+                    f'  <div class="course-meta">'
+                    f'    ECTS {c["ects"]:g}'
+                    f'    <span class="course-meta-sep">·</span>'
+                    f'    Difficulty {c["difficulty"]}/5'
+                    f'    <span class="course-meta-sep">·</span>'
+                    f'    Est. {fmt_hours(c["estimated_hours"])}'
+                    f'  </div>'
+                    f'  <div class="course-exam-row">'
+                    f'    <span class="course-exam-date">{c["exam_date"]:%d %b %Y}</span>'
+                    f'    <span class="course-status-badge {status_cls}">{h(status_txt)}</span>'
+                    f'  </div>'
+                    f'</div>',
                     unsafe_allow_html=True,
                 )
             with edit_col:
@@ -886,20 +899,6 @@ def page_courses(user: dict):
                     st.toast(f"Deleted {c['name']}.")
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
-            st.markdown(
-                f'<div class="course-meta">'
-                f'ECTS {c["ects"]:g}'
-                f'<span class="course-meta-sep">·</span>'
-                f'Difficulty {c["difficulty"]}/5'
-                f'<span class="course-meta-sep">·</span>'
-                f'Est. {fmt_hours(c["estimated_hours"])}'
-                f'</div>'
-                f'<div class="course-exam-row">'
-                f'  <span class="course-exam-date">{c["exam_date"]:%d %b %Y}</span>'
-                f'  <span class="course-status-badge {status_cls}">{h(status_txt)}</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
 
     st.divider()
 
