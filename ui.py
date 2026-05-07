@@ -679,7 +679,8 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Make multiselect tags wrap so the scroll arrows never appear */
+/* Make multiselect tags wrap and add padding so border-radius
+   doesn't clip the first chip */
 [data-testid="stMultiSelect"] [data-baseweb="select"],
 [data-testid="stMultiSelect"] [data-baseweb="select"] > div,
 [data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
@@ -688,9 +689,19 @@ button[kind="primaryFormSubmit"] *,
     flex-wrap: wrap !important;
     overflow: visible !important;
 }
-/* Hide baseweb scroll-left / scroll-right arrow buttons */
-[data-testid="stMultiSelect"] [data-baseweb="select"] button {
+[data-testid="stMultiSelect"] [data-baseweb="tag"] {
+    margin-left: 4px !important;
+}
+/* Hide any scroll-arrow buttons baseweb injects */
+[data-testid="stMultiSelect"] [data-baseweb="select"] button,
+[data-testid="stMultiSelect"] [data-baseweb="select"] [role="button"] {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
 }
 </style>
 """
@@ -715,9 +726,9 @@ def h(value) -> str:
 
 
 def scroll_to_top():
-    st.components.v1.html(
-        "<script>window.parent.document.querySelector('section.main').scrollTo(0,0);</script>",
-        height=0,
+    st.html(
+        "<script>window.parent.document.querySelector('section.main')"
+        ".scrollTo(0,0);</script>"
     )
 
 
