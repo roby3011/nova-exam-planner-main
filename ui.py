@@ -101,7 +101,9 @@ div[role="alert"] svg {
     display: none;
 }
 
-/* ── Reset: strip borders from baseweb inner layers only ── */
+/* ── Reset ALL inner elements — no border ever on the raw input element ── */
+[data-baseweb="input"] input,
+[data-baseweb="input"] textarea,
 [data-baseweb="base-input"],
 [data-baseweb="base-input"] input,
 [data-baseweb="base-input"] textarea {
@@ -109,37 +111,27 @@ div[role="alert"] svg {
     border: none !important;
     border-radius: 0 !important;
     color: var(--ink) !important;
+    box-shadow: none !important;
 }
 
-/* ── Shared border spec for all text-like inputs ── */
-[data-testid="stTextInput"] [data-baseweb="input"],
-[data-testid="stDateInput"] [data-baseweb="input"],
-[data-testid="stNumberInput"] [data-baseweb="input"],
-[data-testid="stTextInput"] input,
-[data-testid="stDateInput"] input,
-[data-testid="stNumberInput"] input {
-    background: #ffffff !important;
-    border: 1.5px solid rgba(17,17,17,0.2) !important;
-    border-radius: 14px !important;
-    color: var(--ink) !important;
-}
+/* ── Border on the OUTER container only, never on the raw <input> ── */
 [data-testid="stTextInput"] [data-baseweb="input"],
 [data-testid="stDateInput"] [data-baseweb="input"],
 [data-testid="stNumberInput"] [data-baseweb="input"] {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
     overflow: hidden;
 }
 [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
 [data-testid="stDateInput"] [data-baseweb="input"]:focus-within,
-[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within,
-[data-testid="stTextInput"] input:focus,
-[data-testid="stDateInput"] input:focus,
-[data-testid="stNumberInput"] input:focus {
+[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
     border-color: rgba(17,17,17,0.32) !important;
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
     outline: none !important;
 }
 
-/* Number input ± step buttons */
+/* Number input ± step buttons — no separate border */
 [data-testid="stNumberInput"] button {
     background: transparent !important;
     border: none !important;
