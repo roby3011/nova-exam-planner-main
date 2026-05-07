@@ -679,14 +679,16 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Make multiselect tags wrap and add margin so the container's
-   border-radius doesn't clip the first chip */
+/* Let multiselect chips wrap to multiple lines */
 [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
     flex-wrap: wrap !important;
     height: auto !important;
 }
-[data-testid="stMultiSelect"] [data-baseweb="tag"] {
-    margin-left: 4px !important;
+/* Push the search input to the end so it never overlaps the first chip */
+[data-testid="stMultiSelect"] input {
+    order: 999 !important;
+    min-width: 4px !important;
+    width: 4px !important;
 }
 </style>
 """
