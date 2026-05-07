@@ -31,6 +31,20 @@ from scheduler import (
     rebalance_course_sessions,
 )
 
+
+def _data_v() -> int:
+    return st.session_state.get("_dv", 0)
+
+def _bust_cache() -> None:
+    st.session_state["_dv"] = st.session_state.get("_dv", 0) + 1
+    sessions_as_df.clear()
+    _list_courses.clear()
+
+@st.cache_data(show_spinner=False)
+def _list_courses(user_id: int, data_version: int = 0) -> list[dict]:
+    return db.list_courses(user_id)
+
+
 APP_TITLE = "Nova Exam Planner"
 APP_TAGLINE = "Study sessions planned around real exam dates."
 DEFAULT_COUNTRY = "PT"
@@ -77,6 +91,7 @@ def greeting() -> str:
     return "Good evening"
 
 
+@st.cache_data(show_spinner=False)
 def logo_data_uri() -> str:
     data = base64.b64encode(NOVA_LOGO_PATH.read_bytes()).decode("ascii")
     return f"data:image/png;base64,{data}"
@@ -92,7 +107,8 @@ def apply_pending_page_choice(page_names: list[str]) -> None:
         st.session_state["page_choice"] = pending
 
 
-def sessions_as_df(user_id: int) -> pd.DataFrame:
+@st.cache_data(show_spinner=False)
+def sessions_as_df(user_id: int, data_version: int = 0) -> pd.DataFrame:
     sessions = db.list_sessions(user_id)
     if not sessions:
         return pd.DataFrame(columns=[
@@ -175,7 +191,7 @@ def redistribute_missed_sessions(user: dict,
 
     today = dt.date.today()
     con = db.get_constraints(user["id"])
-    courses = {c["id"]: c for c in db.list_courses(user["id"])}
+    courses = {c["id"]: c for c in _list_courses(user["id"], data_version=_data_v())}
     if not courses:
         return 0, int(missed["missed_minutes"].sum())
 
@@ -270,7 +286,7 @@ def redistribute_missed_sessions(user: dict,
 
 def render_adaptive_rescheduler(user: dict):
     """Show a dialog when past study time is unfinished."""
-    sessions_df = sessions_as_df(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
     missed = missed_sessions_df(sessions_df)
     if missed.empty:
         st.session_state.pop("missed_rescheduler_dismissed", None)
@@ -309,6 +325,7 @@ def render_adaptive_rescheduler(user: dict):
                     "current limits."
                 )
             st.session_state["missed_rescheduler_dismissed"] = signature
+            _bust_cache()
             st.rerun()
         if c2.button("Remind me later", use_container_width=True):
             st.session_state["missed_rescheduler_dismissed"] = signature
@@ -422,8 +439,8 @@ def page_auth():
 
 
 def page_dashboard(user: dict):
-    courses = db.list_courses(user["id"])
-    sessions_df = sessions_as_df(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
 
     render_page_title(
         f"{greeting()}, {user['display_name']}",
@@ -722,7 +739,7 @@ def page_courses(user: dict):
     editing_id = st.session_state.get("editing_course_id")
     editing = db.get_course(user["id"], editing_id) if editing_id else None
     st.subheader("Edit course" if editing else "Add course")
-    existing_courses = db.list_courses(user["id"])
+    existing_courses = _list_courses(user["id"], data_version=_data_v())
 
     defaults = editing or {
         "name": "",
@@ -831,6 +848,7 @@ def page_courses(user: dict):
                 for k in (ects_key, diff_key):
                     st.session_state.pop(k, None)
                 st.toast(f"{'Updated' if editing else 'Added'} {final_name}.")
+                _bust_cache()
                 st.rerun()
             except Exception as e:
                 st.error(f"Could not save course: {e}")
@@ -845,7 +863,7 @@ def page_courses(user: dict):
     st.divider()
 
     st.subheader("Your courses")
-    courses = db.list_courses(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
     if not courses:
         st.info("No courses yet. Add one above to get started.")
         return
@@ -897,6 +915,7 @@ def page_courses(user: dict):
                              use_container_width=True):
                     db.delete_course(user["id"], c["id"])
                     st.toast(f"Deleted {c['name']}.")
+                    _bust_cache()
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -939,6 +958,7 @@ def page_courses(user: dict):
             return
 
         db.replace_sessions(user["id"], sessions)
+        _bust_cache()
         total_min = sum(s["planned_minutes"] for s in sessions)
         target_min = int(sum(c["estimated_hours"] * 60 for c in courses))
         st.success(
@@ -962,12 +982,12 @@ def page_study_plan(user: dict):
         "plan",
     )
 
-    sessions_df = sessions_as_df(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
     if sessions_df.empty:
         st.info("Generate a plan on the Courses page first.")
         return
 
-    courses = db.list_courses(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
     all_names = [c["name"] for c in courses]
     today = dt.date.today()
 
@@ -1075,10 +1095,12 @@ def page_study_plan(user: dict):
                         db.update_session_completed(
                             user["id"], row["id"],
                             int(row["planned_minutes"]))
+                        _bust_cache()
                         st.rerun()
                     elif not new_val and was_done:
                         db.update_session_completed(
                             user["id"], row["id"], 0)
+                        _bust_cache()
                         st.rerun()
 
     st.divider()
@@ -1101,12 +1123,12 @@ def page_customize(user: dict):
         "edit",
     )
 
-    sessions_df = sessions_as_df(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
     if sessions_df.empty:
         st.info("Generate a plan on the Courses page first.")
         return
 
-    courses = db.list_courses(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
     course_names = sorted(sessions_df["course_name"].unique())
     totals = courses_total_minutes(user["id"])
 
@@ -1241,6 +1263,7 @@ def page_customize(user: dict):
             st.toast(
                 f"Saved {changed} change{'s' if changed != 1 else ''}."
                 if changed else "No changes to save.")
+            _bust_cache()
             st.rerun()
 
     with tab_rebalance:
@@ -1269,7 +1292,7 @@ def page_customize(user: dict):
         if st.button("Rebalance this course", type="primary",
                      use_container_width=True, key="cust_rebalance_btn"):
             if course_obj:
-                sdf = sessions_as_df(user["id"])
+                sdf = sessions_as_df(user["id"], data_version=_data_v())
                 sdf = rebalance_course_sessions(
                     sdf.copy(), course_obj["id"],
                     course_obj["estimated_hours"] * 60)
@@ -1278,6 +1301,7 @@ def page_customize(user: dict):
                         user["id"], int(row["id"]),
                         int(row["planned_minutes"]))
                 st.toast(f"Rebalanced {rebalance_course}.")
+                _bust_cache()
                 st.rerun()
 
 
@@ -1302,7 +1326,7 @@ def page_analytics(user: dict):
         "stats",
     )
 
-    sessions_df = sessions_as_df(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
     if sessions_df.empty:
         st.info("Generate a plan first to see analytics.")
         return
@@ -1322,7 +1346,7 @@ def page_analytics(user: dict):
 
     st.divider()
 
-    courses = db.list_courses(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
     all_names = [c["name"] for c in courses]
     cmap = _analytics_cmap(all_names)
 
@@ -1439,12 +1463,12 @@ def page_study_mode(user: dict):
         "focus",
     )
 
-    courses = db.list_courses(user["id"])
+    courses = _list_courses(user["id"], data_version=_data_v())
     if not courses:
         st.info("Add a course first, then come back here to study it.")
         return
 
-    sessions_df = sessions_as_df(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
     today = dt.date.today()
     today_sessions = sessions_df[
         (sessions_df["session_date"] == today)
@@ -1560,6 +1584,7 @@ def page_study_mode(user: dict):
                 st.toast(f"Logged {fmt_minutes(logged)} for {target['course_name']}.")
             else:
                 st.toast("Nothing to log — session already at 0 minutes.")
+            _bust_cache()
             st.rerun()
     with c2:
         if target["kind"] == "session":
@@ -1576,6 +1601,7 @@ def page_study_mode(user: dict):
                 st.toast(
                     f"Session complete — {fmt_minutes(logged)} logged for "
                     f"{target['course_name']}.")
+                _bust_cache()
                 st.rerun()
         else:
             all_rounds_label = (
@@ -1586,6 +1612,7 @@ def page_study_mode(user: dict):
                 logged = log_study_minutes(user["id"], target, total_focus)
                 st.toast(
                     f"Logged {fmt_minutes(logged)} for {target['course_name']}.")
+                _bust_cache()
                 st.rerun()
 
 def log_study_minutes(user_id: int, target: dict, minutes: int) -> int:
@@ -1806,6 +1833,7 @@ def page_profile(user: dict):
         if st.button("Clear my study data", type="secondary"):
             db.clear_user_data(user["id"])
             st.toast("All courses and sessions deleted.")
+            _bust_cache()
             st.rerun()
 
 
@@ -1816,8 +1844,8 @@ def page_export(user: dict):
         "files",
     )
 
-    sessions_df = sessions_as_df(user["id"])
-    courses = db.list_courses(user["id"])
+    sessions_df = sessions_as_df(user["id"], data_version=_data_v())
+    courses = _list_courses(user["id"], data_version=_data_v())
 
     # ── Export study plan ─────────────────────────────────────────────────
     st.subheader("Export study plan")
@@ -1888,7 +1916,7 @@ def page_export(user: dict):
     if uploaded:
         try:
             df = pd.read_csv(uploaded, parse_dates=["exam_date"])
-            existing_by_name = {c["name"]: c for c in db.list_courses(user["id"])}
+            existing_by_name = {c["name"]: c for c in _list_courses(user["id"], data_version=_data_v())}
             imported = 0
             for _, r in df.iterrows():
                 exam_d = r["exam_date"]
@@ -1905,6 +1933,7 @@ def page_export(user: dict):
                     course_id=existing["id"] if existing else None,
                 )
                 imported += 1
+            _bust_cache()
             st.success(f"Imported/updated {imported} courses.")
         except Exception as e:
             st.error(f"Import failed: {e}")
@@ -1998,10 +2027,10 @@ def render_sidebar(user: dict) -> str:
         )
         st.divider()
 
-        n_courses = len(db.list_courses(user["id"]))
+        n_courses = len(_list_courses(user["id"], data_version=_data_v()))
         st.caption(f"{n_courses} course{'s' if n_courses != 1 else ''}")
         if db.has_plan(user["id"]):
-            df = sessions_as_df(user["id"])
+            df = sessions_as_df(user["id"], data_version=_data_v())
             total = int(df["planned_minutes"].sum())
             done = int(df["completed_minutes"].sum())
             st.caption(f"{fmt_minutes(total)} planned")
