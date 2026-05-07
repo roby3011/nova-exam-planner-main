@@ -1137,9 +1137,9 @@ def page_customize(user: dict):
 
         cf1, cf2 = st.columns(2)
         with cf1:
-            sel_courses = st.multiselect(
+            sel_courses = st.pills(
                 "Filter by course", course_names, default=course_names,
-                key="cust_course_filter")
+                selection_mode="multi", key="cust_course_filter")
         filtered = sessions_df[sessions_df["course_name"].isin(sel_courses)]
 
         with cf2:

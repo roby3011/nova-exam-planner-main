@@ -679,6 +679,29 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
+/* Pills — unselected: subtle outline; selected: solid black */
+[data-testid="stPills"] button {
+    border: 1.5px solid rgba(17,17,17,0.25) !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: var(--ink) !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    padding: 4px 14px !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+[data-testid="stPills"] button:hover {
+    border-color: var(--ink) !important;
+    background: rgba(17,17,17,0.06) !important;
+}
+[data-testid="stPills"] button[aria-selected="true"],
+[data-testid="stPills"] button[data-selected="true"],
+[data-testid="stPills"] button[kind="pillsActive"] {
+    background: var(--ink) !important;
+    color: #ffffff !important;
+    border-color: var(--ink) !important;
+}
+
 </style>
 """
 
