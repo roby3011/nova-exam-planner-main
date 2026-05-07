@@ -101,23 +101,9 @@ div[role="alert"] svg {
     display: none;
 }
 
-/* Outer baseweb containers — single visible border, no double-frame */
+/* ── Reset: strip all borders/backgrounds from every baseweb inner layer ── */
 [data-baseweb="input"],
-[data-baseweb="select"],
-[data-baseweb="textarea"] {
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(17,17,17,0.2) !important;
-    overflow: hidden;
-}
-
-/* Inner container — transparent so only the outer border shows */
-[data-baseweb="base-input"] {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-}
-
+[data-baseweb="base-input"],
 [data-baseweb="base-input"] input,
 [data-baseweb="base-input"] textarea {
     background: transparent !important;
@@ -126,32 +112,82 @@ div[role="alert"] svg {
     color: var(--ink) !important;
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: #7a7a7a !important;
-    opacity: 1 !important;
+/* ── Text inputs: [data-baseweb="input"] is the full widget container ── */
+[data-testid="stTextInput"] [data-baseweb="input"] {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
+[data-testid="stTextInput"] [data-baseweb="input"]:focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
 
-[data-baseweb="input"]:focus-within,
-[data-baseweb="select"]:focus-within,
-[data-baseweb="textarea"]:focus-within {
-    border-color: rgba(17, 17, 17, 0.32) !important;
-    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08) !important;
-    outline: none !important;
+/* ── Number inputs: the ± buttons are siblings of [data-baseweb="input"],  ──
+   so we style their shared parent — the div that has both as direct children. */
+[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]):has(> button) {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
+[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]):has(> button):focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
 
 /* Number input ± step buttons */
-[data-baseweb="input"] button,
 .stNumberInput button {
     background: transparent !important;
     border: none !important;
     color: var(--ink) !important;
 }
 
-/* Selectbox dropdown arrow container */
+/* ── Date inputs ── */
+[data-testid="stDateInput"] [data-baseweb="input"] {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
+[data-testid="stDateInput"] [data-baseweb="input"]:focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
+}
+
+/* ── Select boxes ── */
+[data-baseweb="select"] {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
 [data-baseweb="select"] > div {
     border: none !important;
     background: transparent !important;
+}
+[data-baseweb="select"]:focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
+}
+
+/* ── Textareas ── */
+[data-baseweb="textarea"] {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+}
+[data-baseweb="textarea"]:focus-within {
+    border-color: rgba(17,17,17,0.32) !important;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #7a7a7a !important;
+    opacity: 1 !important;
 }
 
 [data-baseweb="tab-highlight"] {
