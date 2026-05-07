@@ -2042,7 +2042,13 @@ def main():
     if prev != choice:
         st.session_state["_prev_page"] = choice
         st.components.v1.html(
-            "<script>window.parent.scrollTo({top:0,behavior:'instant'});</script>",
+            """<script>
+            (function() {
+                var el = window.parent.document.querySelector('[data-testid="stAppViewContainer"]');
+                if (el) { el.scrollTop = 0; }
+                window.parent.scrollTo(0, 0);
+            })();
+            </script>""",
             height=0,
         )
 
