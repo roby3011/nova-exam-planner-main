@@ -465,17 +465,16 @@ def page_dashboard(user: dict):
         key=lambda c: c["exam_date"], default=None)
 
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Courses", len(courses))
-    k2.metric("Planned", fmt_minutes(total_planned))
-    k3.metric("Completed", f"{pct:.0f}%",
-              fmt_minutes(total_completed))
+    k1.metric("Courses", len(courses), delta="​", delta_color="off")
+    k2.metric("Planned", fmt_minutes(total_planned), delta="​", delta_color="off")
+    k3.metric("Completed", f"{pct:.0f}%", fmt_minutes(total_completed))
     if next_exam:
         days = (next_exam["exam_date"] - dt.date.today()).days
         k4.metric("Next exam",
                   f"{days} day{'s' if days != 1 else ''}",
                   next_exam["name"])
     else:
-        k4.metric("Next exam", "-")
+        k4.metric("Next exam", "-", delta="​", delta_color="off")
 
     render_capacity_warning(courses, sessions_df)
 
