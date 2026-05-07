@@ -101,15 +101,28 @@ div[role="alert"] svg {
     display: none;
 }
 
-.stTextInput input,
-.stNumberInput input,
-.stDateInput input,
-textarea,
-input {
+/* Outer baseweb containers — single visible border, no double-frame */
+[data-baseweb="input"],
+[data-baseweb="select"],
+[data-baseweb="textarea"] {
     background: #ffffff !important;
-    border-color: rgba(17,17,17,0.2) !important;
-    border-width: 1.5px !important;
     border-radius: 14px !important;
+    border: 1.5px solid rgba(17,17,17,0.2) !important;
+    overflow: hidden;
+}
+
+/* Inner container — transparent so only the outer border shows */
+[data-baseweb="base-input"] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+[data-baseweb="base-input"] input,
+[data-baseweb="base-input"] textarea {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     color: var(--ink) !important;
 }
 
@@ -119,26 +132,18 @@ textarea::placeholder {
     opacity: 1 !important;
 }
 
-input:focus,
-textarea:focus {
+[data-baseweb="input"]:focus-within,
+[data-baseweb="select"]:focus-within,
+[data-baseweb="textarea"]:focus-within {
     border-color: rgba(17, 17, 17, 0.32) !important;
     box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08) !important;
     outline: none !important;
 }
 
-[data-baseweb="input"],
-[data-baseweb="select"],
-[data-baseweb="textarea"],
-[data-baseweb="base-input"] {
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(17,17,17,0.2) !important;
-}
-
 /* Number input ± step buttons */
 [data-baseweb="input"] button,
 .stNumberInput button {
-    background: #ffffff !important;
+    background: transparent !important;
     border: none !important;
     color: var(--ink) !important;
 }
@@ -146,7 +151,7 @@ textarea:focus {
 /* Selectbox dropdown arrow container */
 [data-baseweb="select"] > div {
     border: none !important;
-    background: #ffffff !important;
+    background: transparent !important;
 }
 
 [data-baseweb="tab-highlight"] {
