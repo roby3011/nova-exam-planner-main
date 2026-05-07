@@ -707,8 +707,16 @@ def h(value) -> str:
     return escape(str(value), quote=True)
 
 
+def scroll_to_top():
+    st.components.v1.html(
+        "<script>window.parent.document.querySelector('section.main').scrollTo(0,0);</script>",
+        height=0,
+    )
+
+
 def render_page_title(title: str, subtitle: str = "", kicker: str = "nova",
                       logo_src: str = ""):
+    scroll_to_top()
     subtitle_html = f"<p>{h(subtitle)}</p>" if subtitle else ""
     logo_html = (
         f'<div class="nova-title-logo"><img src="{h(logo_src)}" alt="Nova SBE" /></div>'
