@@ -2000,6 +2000,7 @@ def render_sidebar(user: dict) -> str:
         st.divider()
         if st.button("Log out", use_container_width=True):
             auth.logout()
+            st.query_params.clear()
             st.rerun()
 
         st.caption(APP_TITLE)
@@ -2016,13 +2017,35 @@ def main():
     db.init_db()
     apply_theme()
 
+    # Restore login from persisted session token (survives page refresh)
+    if not auth.current_user():
+        token = st.query_params.get("session")
+        if token and auth.restore_from_token(token):
+            st.rerun()
+
     user = auth.current_user()
     if not user:
+        st.query_params.clear()
         page_auth()
         return
 
+    # Persist session token in URL so it survives refresh
+    token = st.session_state.get("_session_token")
+    if token:
+        st.query_params["session"] = token
+
     apply_pending_page_choice(PAGE_NAMES)
     choice = render_sidebar(user)
+
+    # Scroll to top whenever the user navigates to a different page
+    prev = st.session_state.get("_prev_page")
+    if prev != choice:
+        st.session_state["_prev_page"] = choice
+        st.components.v1.html(
+            "<script>window.parent.scrollTo({top:0,behavior:'instant'});</script>",
+            height=0,
+        )
+
     render_adaptive_rescheduler(user)
     PAGE_BY_NAME[choice](user)
 
