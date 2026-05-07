@@ -661,15 +661,15 @@ def page_courses(user: dict):
             "Plan start date", con["start_date"])
 
     _pd_all = list(DAY_NAMES)
-    _pd_col1, _pd_col2, _pd_col3 = st.columns([4, 1, 1])
+    _pd_col1, _pd_col2, _pd_col3 = st.columns([6, 0.55, 0.55])
     with _pd_col1:
         st.markdown("**Preferred study days**")
     with _pd_col2:
-        if st.button("All", key="days_sel_all", use_container_width=True):
+        if st.button("✓", key="days_sel_all", use_container_width=True, help="Select all"):
             st.session_state["pref_days_pills"] = _pd_all
             st.rerun()
     with _pd_col3:
-        if st.button("None", key="days_sel_none", use_container_width=True):
+        if st.button("✕", key="days_sel_none", use_container_width=True, help="Clear all"):
             st.session_state["pref_days_pills"] = []
             st.rerun()
 
@@ -1155,15 +1155,15 @@ def page_customize(user: dict):
 
         cf1, cf2 = st.columns(2)
         with cf1:
-            _cc_h1, _cc_h2, _cc_h3 = st.columns([4, 1, 1])
+            _cc_h1, _cc_h2, _cc_h3 = st.columns([6, 0.55, 0.55])
             with _cc_h1:
                 st.markdown("**Filter by course**")
             with _cc_h2:
-                if st.button("All", key="cust_sel_all", use_container_width=True):
+                if st.button("✓", key="cust_sel_all", use_container_width=True, help="Select all"):
                     st.session_state["cust_course_filter"] = list(course_names)
                     st.rerun()
             with _cc_h3:
-                if st.button("None", key="cust_sel_none", use_container_width=True):
+                if st.button("✕", key="cust_sel_none", use_container_width=True, help="Clear all"):
                     st.session_state["cust_course_filter"] = []
                     st.rerun()
 
