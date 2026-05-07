@@ -101,8 +101,7 @@ div[role="alert"] svg {
     display: none;
 }
 
-/* ── Reset: strip all borders/backgrounds from every baseweb inner layer ── */
-[data-baseweb="input"],
+/* ── Reset: strip borders from baseweb inner layers only ── */
 [data-baseweb="base-input"],
 [data-baseweb="base-input"] input,
 [data-baseweb="base-input"] textarea {
@@ -112,47 +111,39 @@ div[role="alert"] svg {
     color: var(--ink) !important;
 }
 
-/* ── Text inputs: [data-baseweb="input"] is the full widget container ── */
-[data-testid="stTextInput"] [data-baseweb="input"] {
+/* ── Shared border spec for all text-like inputs ── */
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stDateInput"] [data-baseweb="input"],
+[data-testid="stNumberInput"] [data-baseweb="input"],
+[data-testid="stTextInput"] input,
+[data-testid="stDateInput"] input,
+[data-testid="stNumberInput"] input {
     background: #ffffff !important;
     border: 1.5px solid rgba(17,17,17,0.2) !important;
     border-radius: 14px !important;
-    overflow: hidden;
+    color: var(--ink) !important;
 }
-[data-testid="stTextInput"] [data-baseweb="input"]:focus-within {
-    border-color: rgba(17,17,17,0.32) !important;
-    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
-}
-
-/* ── Number inputs: same treatment as date/text inputs ── */
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stDateInput"] [data-baseweb="input"],
 [data-testid="stNumberInput"] [data-baseweb="input"] {
-    background: #ffffff !important;
-    border: 1.5px solid rgba(17,17,17,0.2) !important;
-    border-radius: 14px !important;
     overflow: hidden;
 }
-[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
+[data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
+[data-testid="stDateInput"] [data-baseweb="input"]:focus-within,
+[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within,
+[data-testid="stTextInput"] input:focus,
+[data-testid="stDateInput"] input:focus,
+[data-testid="stNumberInput"] input:focus {
     border-color: rgba(17,17,17,0.32) !important;
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
+    outline: none !important;
 }
 
 /* Number input ± step buttons */
-.stNumberInput button {
+[data-testid="stNumberInput"] button {
     background: transparent !important;
     border: none !important;
     color: var(--ink) !important;
-}
-
-/* ── Date inputs ── */
-[data-testid="stDateInput"] [data-baseweb="input"] {
-    background: #ffffff !important;
-    border: 1.5px solid rgba(17,17,17,0.2) !important;
-    border-radius: 14px !important;
-    overflow: hidden;
-}
-[data-testid="stDateInput"] [data-baseweb="input"]:focus-within {
-    border-color: rgba(17,17,17,0.32) !important;
-    box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
 
 /* ── Select boxes ── */
@@ -193,10 +184,11 @@ textarea::placeholder {
     background-color: var(--ink) !important;
 }
 
-.stButton > button,
+.stButton button,
 [data-testid="stFormSubmitButton"] button,
-[data-testid="stBaseButton-secondary"],
-[data-testid="stBaseButton-secondaryFormSubmit"] {
+[data-testid^="stBaseButton"] button,
+button[kind="secondary"],
+button[kind="secondaryFormSubmit"] {
     border: 1.5px solid var(--line) !important;
     border-radius: 14px !important;
     background: var(--panel) !important;
