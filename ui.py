@@ -361,9 +361,7 @@ button[kind="primaryFormSubmit"] * {
 }
 
 .nova-sidebar-meta {
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .nova-sidebar-meta .hello {
