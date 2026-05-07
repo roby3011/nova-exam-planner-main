@@ -83,8 +83,8 @@ code {
 [data-testid="stAlertContainer"],
 div[role="alert"] {
     background: var(--soft-2) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: var(--radius-md) !important;
+    border: 1.5px solid var(--line) !important;
+    border-radius: 14px !important;
     color: var(--ink) !important;
     box-shadow: none !important;
 }
