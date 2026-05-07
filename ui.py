@@ -679,26 +679,49 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Fix multiselect: wrap chips, remove overflow clipping, push input last */
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div,
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
-    flex-wrap: wrap !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding-left: 6px !important;
-}
-[data-testid="stMultiSelect"] input {
-    order: 999 !important;
-    min-width: 2px !important;
-    width: 2px !important;
-    padding: 0 !important;
-}
 </style>
+"""
+
+
+_MULTISELECT_FIX_JS = """
+<script>
+(function() {
+  function fix() {
+    var doc = window.parent ? window.parent.document : document;
+    doc.querySelectorAll('[data-testid="stMultiSelect"]').forEach(function(ms) {
+      // Walk every div descendant and allow wrapping / visible overflow
+      ms.querySelectorAll('div').forEach(function(d) {
+        d.style.setProperty('overflow', 'visible', 'important');
+        d.style.setProperty('height', 'auto', 'important');
+        if (getComputedStyle(d).display === 'flex') {
+          d.style.setProperty('flex-wrap', 'wrap', 'important');
+        }
+      });
+      // Move the search input to the end so it never sits before Monday
+      var inp = ms.querySelector('input[type="text"]');
+      if (inp && inp.parentNode) {
+        inp.parentNode.appendChild(inp);
+        inp.style.setProperty('min-width', '2px', 'important');
+        inp.style.setProperty('width', '2px', 'important');
+        inp.style.setProperty('padding', '0', 'important');
+      }
+      // Make sure the first tag has enough left breathing room
+      var firstTag = ms.querySelector('[data-baseweb="tag"]');
+      if (firstTag) firstTag.style.setProperty('margin-left', '6px', 'important');
+    });
+  }
+  fix();
+  var obs = new MutationObserver(fix);
+  obs.observe(window.parent ? window.parent.document.body : document.body,
+              {childList: true, subtree: true});
+})();
+</script>
 """
 
 
 def apply_theme():
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+    st.components.v1.html(_MULTISELECT_FIX_JS, height=0)
 
 
 def fmt_minutes(minutes: float) -> str:
