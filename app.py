@@ -2038,23 +2038,21 @@ def main():
     choice = render_sidebar(user)
 
     # Scroll to top whenever the user navigates to a different page.
-    # Uses an onerror img trick so the JS runs directly in the page
-    # context (not inside a sandboxed iframe like st.components.v1.html).
     prev = st.session_state.get("_prev_page")
     if prev != choice:
         st.session_state["_prev_page"] = choice
-        st.markdown(
-            '<img src="x" onerror="'
-            "(function(){"
-            "var ids=['stAppViewContainer','stMain','stVerticalBlock'];"
-            "ids.forEach(function(id){"
-            "var e=document.querySelector('[data-testid='+id+']');"
-            "if(e)e.scrollTop=0;});"
-            "window.scrollTo(0,0);"
-            "document.documentElement.scrollTop=0;"
-            "})()"
-            '" style="display:none">',
-            unsafe_allow_html=True,
+        st.components.v1.html(
+            """<script>
+            function scrollTop() {
+                var el = window.parent.document.querySelector('section.main');
+                if (el) el.scrollTo(0, 0);
+            }
+            scrollTop();
+            setTimeout(scrollTop, 50);
+            setTimeout(scrollTop, 150);
+            setTimeout(scrollTop, 400);
+            </script>""",
+            height=0,
         )
 
     render_adaptive_rescheduler(user)
