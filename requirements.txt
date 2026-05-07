@@ -3,4 +3,3 @@ pandas>=2.0.0,<3.0.0
 plotly>=5.18.0,<6.0.0
 requests>=2.31.0,<3.0.0
 streamlit-scroll-to-top>=0.0.4
-streamlit-js-eval>=0.1.7
