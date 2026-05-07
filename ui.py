@@ -33,6 +33,11 @@ header[data-testid="stHeader"] {
     background: var(--paper);
 }
 
+/* Prevent browser from adding top offset when scroll_to_here focuses its iframe */
+section.main, [data-testid="stAppViewContainer"] {
+    scroll-padding-top: 0 !important;
+}
+
 .main .block-container {
     max-width: 1180px;
     padding-top: 1.4rem;
