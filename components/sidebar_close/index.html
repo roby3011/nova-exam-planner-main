@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><style>html,body{margin:0;padding:0;height:0;overflow:hidden;}</style></head>
+<body>
+<script>
+(function () {
+  if (window.parent.innerWidth >= 768) return;
+  function tryClose(attempts) {
+    var s = window.parent.document.querySelector('[data-testid="stSidebar"]');
+    if (!s) return;
+    var expanded = s.getAttribute('aria-expanded');
+    if (expanded === 'false') return;
+    var b = window.parent.document.querySelector('[data-testid="stSidebarCollapseButton"]')
+         || s.querySelector('button');
+    if (b) { b.click(); return; }
+    if (attempts > 0) setTimeout(function () { tryClose(attempts - 1); }, 100);
+  }
+  setTimeout(function () { tryClose(5); }, 100);
+})();
+</script>
+</body>
+</html>
