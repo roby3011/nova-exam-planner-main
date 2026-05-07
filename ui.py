@@ -679,17 +679,19 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Let multiselect chips wrap to multiple lines */
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+/* Fix multiselect: wrap chips, remove overflow clipping, push input last */
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
     flex-wrap: wrap !important;
     height: auto !important;
-    padding-left: 8px !important;
+    overflow: visible !important;
+    padding-left: 6px !important;
 }
-/* Push the search input to the end so it never overlaps the first chip */
 [data-testid="stMultiSelect"] input {
     order: 999 !important;
-    min-width: 4px !important;
-    width: 4px !important;
+    min-width: 2px !important;
+    width: 2px !important;
+    padding: 0 !important;
 }
 </style>
 """
