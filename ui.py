@@ -124,15 +124,15 @@ div[role="alert"] svg {
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
 
-/* ── Number inputs: the ± buttons are siblings of [data-baseweb="input"],  ──
-   so we style their shared parent — the div that has both as direct children. */
-[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]):has(> button) {
+/* ── Number inputs: the ± buttons are siblings of [data-baseweb="input"].
+   Target the direct child wrapper that is not the label (stWidgetLabel). */
+[data-testid="stNumberInput"] > div:not([data-testid]) {
     background: #ffffff !important;
     border: 1.5px solid rgba(17,17,17,0.2) !important;
     border-radius: 14px !important;
     overflow: hidden;
 }
-[data-testid="stNumberInput"] div:has(> [data-baseweb="input"]):has(> button):focus-within {
+[data-testid="stNumberInput"] > div:not([data-testid]):focus-within {
     border-color: rgba(17,17,17,0.32) !important;
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
