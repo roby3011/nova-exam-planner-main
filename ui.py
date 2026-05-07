@@ -742,65 +742,6 @@ button[kind="primaryFormSubmit"] * {
     color: #6b7280;
 }
 
-/* Export page section cards */
-.nova-export-section {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    padding: 1.2rem 1.3rem;
-    margin-bottom: 1rem;
-}
-
-.nova-export-section h3 {
-    margin-bottom: 0.75rem;
-}
-
-/* Study Mode timer outer card color */
-.nova-timer-wrap {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-
-/* Customize session card */
-.nova-session-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 0.6rem 0.9rem;
-    margin-bottom: 0.4rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.nova-session-card .sc-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.nova-session-card .sc-info {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.nova-session-card .sc-name {
-    font-weight: 700;
-    font-size: 0.92rem;
-    color: var(--ink);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.nova-session-card .sc-meta {
-    font-size: 0.78rem;
-    color: var(--muted);
-}
 
 @media (max-width: 900px) {
     .nova-title-row {

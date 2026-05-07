@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import datetime as dt
-from streamlit_scroll_to_top import scroll_to_here
 import base64
+import datetime as dt
 from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 import streamlit as st
+from streamlit_scroll_to_top import scroll_to_here
 
 import database as db
 import auth
@@ -431,7 +431,6 @@ def page_dashboard(user: dict):
         "dashboard",
     )
 
-    # Motivational quote
     quote = get_motivational_quote()
     if quote.get("ok") and quote.get("quote"):
         author_html = (
@@ -1878,14 +1877,13 @@ def page_export(user: dict):
     if uploaded:
         try:
             df = pd.read_csv(uploaded, parse_dates=["exam_date"])
+            existing_by_name = {c["name"]: c for c in db.list_courses(user["id"])}
             imported = 0
             for _, r in df.iterrows():
                 exam_d = r["exam_date"]
                 if hasattr(exam_d, "date"):
                     exam_d = exam_d.date()
-                existing = next(
-                    (c for c in db.list_courses(user["id"])
-                     if c["name"] == str(r["name"])), None)
+                existing = existing_by_name.get(str(r["name"]))
                 db.upsert_course(
                     user["id"],
                     name=str(r["name"]).strip(),
