@@ -2053,12 +2053,15 @@ def main():
         st.session_state["_prev_page"] = choice
         scroll_to_here(0, key=f"scroll_top_{choice}")
         st.markdown(
-            '<img src onerror="'
+            '<img src="x" onerror="'
             "(function(){"
             "if(window.innerWidth>=768)return;"
-            "var b=document.querySelector('[data-testid=\"stSidebarCollapseButton\"]');"
-            "if(b)setTimeout(function(){b.click();},80);"
-            "})()\"" ">",
+            "var s=document.querySelector('[data-testid=\"stSidebar\"]');"
+            "if(!s||s.getAttribute('aria-expanded')==='false')return;"
+            "var b=s.querySelector('button')||"
+            "document.querySelector('[data-testid=\"stSidebarCollapseButton\"]');"
+            "if(b)setTimeout(function(){b.click();},120);"
+            '})()">',
             unsafe_allow_html=True,
         )
 
