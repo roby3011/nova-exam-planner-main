@@ -660,10 +660,11 @@ def page_courses(user: dict):
         start_date = st.date_input(
             "Plan start date", con["start_date"])
 
-    preferred_days = st.multiselect(
+    preferred_days = st.pills(
         "Preferred study days",
         DAY_NAMES,
         default=con["preferred_days"] or DAY_NAMES,
+        selection_mode="multi",
     )
     if not preferred_days:
         st.warning("Select at least one study day.")

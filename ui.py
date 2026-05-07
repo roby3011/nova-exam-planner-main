@@ -683,50 +683,8 @@ button[kind="primaryFormSubmit"] *,
 """
 
 
-_MULTISELECT_FIX_JS = """
-<script>
-(function() {
-  try {
-    var doc = (window.parent || window).document;
-    if (doc.getElementById('nova-ms-fix')) return;
-    var s = doc.createElement('style');
-    s.id = 'nova-ms-fix';
-    s.textContent = [
-      /* chips wrap, no overflow clipping */
-      '[data-testid="stMultiSelect"] [data-baseweb="select"] > div {',
-      '  flex-wrap: wrap !important;',
-      '  height: auto !important;',
-      '  overflow: visible !important;',
-      '}',
-      /* make the search input completely invisible */
-      '[data-testid="stMultiSelect"] input[type="text"] {',
-      '  opacity: 0 !important;',
-      '  position: absolute !important;',
-      '  pointer-events: none !important;',
-      '  width: 1px !important;',
-      '  min-width: 0 !important;',
-      '  height: 1px !important;',
-      '  padding: 0 !important;',
-      '  margin: 0 !important;',
-      '  border: 0 !important;',
-      '  outline: 0 !important;',
-      '  box-shadow: none !important;',
-      '}',
-      /* give Monday a small left margin so rounded corner does not clip it */
-      '[data-testid="stMultiSelect"] [data-baseweb="tag"]:first-child {',
-      '  margin-left: 6px !important;',
-      '}'
-    ].join('\\n');
-    doc.head.appendChild(s);
-  } catch(e) {}
-})();
-</script>
-"""
-
-
 def apply_theme():
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
-    st.components.v1.html(_MULTISELECT_FIX_JS, height=0)
 
 
 def fmt_minutes(minutes: float) -> str:
