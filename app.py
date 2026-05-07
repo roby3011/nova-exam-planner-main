@@ -2047,11 +2047,20 @@ def main():
     apply_pending_page_choice(PAGE_NAMES)
     choice = render_sidebar(user)
 
-    # Scroll to top whenever the user navigates to a different page.
+    # Scroll to top and close sidebar (mobile) whenever the user navigates to a different page.
     prev = st.session_state.get("_prev_page")
     if prev != choice:
         st.session_state["_prev_page"] = choice
         scroll_to_here(0, key=f"scroll_top_{choice}")
+        st.markdown(
+            '<img src onerror="'
+            "(function(){"
+            "if(window.innerWidth>=768)return;"
+            "var b=document.querySelector('[data-testid=\"stSidebarCollapseButton\"]');"
+            "if(b)setTimeout(function(){b.click();},80);"
+            "})()\"" ">",
+            unsafe_allow_html=True,
+        )
 
     render_adaptive_rescheduler(user)
     PAGE_BY_NAME[choice](user)
