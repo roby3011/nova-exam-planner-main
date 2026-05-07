@@ -34,10 +34,16 @@ header[data-testid="stHeader"] {
     background: var(--paper);
 }
 
-/* Desktop: hide the header bar entirely to remove the dead space above content */
+/* Desktop: collapse header to zero height but keep overflow visible so the
+   sidebar toggle button remains accessible when the sidebar is collapsed */
 @media screen and (min-width: 768px) {
     header[data-testid="stHeader"] {
-        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     section.main,
     section[data-testid="stMain"] {
