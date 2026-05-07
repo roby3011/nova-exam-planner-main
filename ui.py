@@ -11,8 +11,8 @@ CUSTOM_CSS = """
     --panel: #ffffff;
     --ink: #111111;
     --muted: #666666;
-    --line: rgba(17, 17, 17, 0.12);
-    --line-strong: rgba(17, 17, 17, 0.18);
+    --line: rgba(17, 17, 17, 0.2);
+    --line-strong: rgba(17, 17, 17, 0.28);
     --accent: #2563eb;
     --success: #16a34a;
     --warn: #d97706;
@@ -196,8 +196,8 @@ textarea::placeholder {
 
 .stButton > button,
 [data-testid="stFormSubmitButton"] button {
-    border: 1px solid var(--line);
-    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
     background: var(--panel);
     color: var(--ink);
     font-weight: 700;
@@ -557,8 +557,8 @@ button[kind="primaryFormSubmit"] *,
 /* Fix expander content contrast */
 [data-testid="stExpander"] {
     background: var(--panel) !important;
-    border: 1px solid var(--line) !important;
-    border-radius: var(--radius-md) !important;
+    border: 1.5px solid var(--line) !important;
+    border-radius: 14px !important;
     overflow: hidden;
 }
 
