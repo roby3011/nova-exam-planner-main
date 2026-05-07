@@ -198,9 +198,10 @@ textarea::placeholder {
     background-color: var(--ink) !important;
 }
 
-.stButton button,
+/* Secondary / default buttons */
+[data-testid="stBaseButton-secondary"] button,
+[data-testid="stBaseButton-secondaryFormSubmit"] button,
 [data-testid="stFormSubmitButton"] button,
-[data-testid^="stBaseButton"] button,
 button[kind="secondary"],
 button[kind="secondaryFormSubmit"] {
     border: 1.5px solid var(--line) !important;
@@ -211,31 +212,33 @@ button[kind="secondaryFormSubmit"] {
     box-shadow: 0 8px 18px rgba(17, 17, 17, 0.05) !important;
 }
 
-.stButton > button:hover,
-[data-testid="stFormSubmitButton"] button:hover {
-    border-color: var(--line);
-    background: var(--soft);
-    color: var(--ink);
+[data-testid="stBaseButton-secondary"] button:hover,
+[data-testid="stBaseButton-secondaryFormSubmit"] button:hover {
+    background: var(--soft) !important;
 }
 
-.stButton > button[kind="primary"],
-.stButton > button[kind="primaryFormSubmit"],
+/* Primary buttons */
+[data-testid="stBaseButton-primary"] button,
+[data-testid="stBaseButton-primaryFormSubmit"] button,
 button[kind="primary"],
-button[kind="primaryFormSubmit"],
-[data-testid="stBaseButton-primary"],
-[data-testid="stBaseButton-primaryFormSubmit"] {
-    background: var(--ink);
-    color: #ffffff;
-    border-color: var(--ink);
+button[kind="primaryFormSubmit"] {
+    background: var(--ink) !important;
+    color: #ffffff !important;
+    border: 1.5px solid var(--ink) !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
 }
 
-.stButton > button[kind="primary"] *,
-.stButton > button[kind="primaryFormSubmit"] *,
+[data-testid="stBaseButton-primary"] button *,
+[data-testid="stBaseButton-primaryFormSubmit"] button *,
 button[kind="primary"] *,
-button[kind="primaryFormSubmit"] *,
-[data-testid="stBaseButton-primary"] *,
-[data-testid="stBaseButton-primaryFormSubmit"] * {
+button[kind="primaryFormSubmit"] * {
     color: #ffffff !important;
+}
+
+[data-testid="stBaseButton-primary"] button:hover,
+[data-testid="stBaseButton-primaryFormSubmit"] button:hover {
+    opacity: 0.88 !important;
 }
 
 .stProgress > div > div {
