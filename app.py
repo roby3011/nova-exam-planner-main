@@ -10,13 +10,8 @@ from typing import Optional
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as _stc
+from streamlit_js_eval import streamlit_js_eval
 from streamlit_scroll_to_top import scroll_to_here
-
-_close_sidebar = _stc.declare_component(
-    "sidebar_close",
-    path=str(Path(__file__).parent / "components" / "sidebar_close"),
-)
 
 import database as db
 import auth
@@ -2058,7 +2053,17 @@ def main():
     if prev != choice:
         st.session_state["_prev_page"] = choice
         scroll_to_here(0, key=f"scroll_top_{choice}")
-        _close_sidebar(key=f"close_sidebar_{choice}")
+        streamlit_js_eval(
+            js_expressions=(
+                "(function(){"
+                "if(window.innerWidth>=768)return null;"
+                "var b=document.querySelector('[data-testid=\"stSidebarCollapseButton\"]')"
+                "||document.querySelector('[data-testid=\"stSidebar\"] button');"
+                "if(b)b.click();return null;"
+                "})()"
+            ),
+            key=f"close_sidebar_{choice}",
+        )
 
     render_adaptive_rescheduler(user)
     PAGE_BY_NAME[choice](user)
