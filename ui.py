@@ -33,14 +33,19 @@ header[data-testid="stHeader"] {
     background: var(--paper);
 }
 
-/* Prevent browser from adding top offset when scroll_to_here focuses its iframe */
-section.main, [data-testid="stAppViewContainer"] {
-    scroll-padding-top: 0 !important;
+/* Remove Streamlit's default header-height top padding; scroll_to_here aligns to content box */
+section.main {
+    padding-top: 0 !important;
+    scroll-padding-top: 0.75rem !important;
+}
+
+[data-testid="stAppViewContainer"] {
+    scroll-padding-top: 0.75rem !important;
 }
 
 .main .block-container {
     max-width: 1180px;
-    padding-top: 1.4rem;
+    padding-top: 0.75rem;
     padding-bottom: 3rem;
 }
 
