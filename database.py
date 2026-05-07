@@ -4,10 +4,11 @@ import os
 import sqlite3
 import datetime as dt
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Optional
 
-DATA_DIR = "data"
-DB_PATH = os.path.join(DATA_DIR, "nova.db")
+DATA_DIR = Path(__file__).parent / "data"
+DB_PATH = DATA_DIR / "nova.db"
 DEFAULT_COUNTRY = "PT"
 
 

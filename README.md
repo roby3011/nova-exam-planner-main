@@ -5,6 +5,11 @@ It supports multiple users, stores data in SQLite, can skip public holidays, and
 exports the generated plan as CSV or calendar events. It also shows the Nova SBE
 cafeteria menu for the week.
 
+## Requirements
+
+- Python 3.9 or newer
+- Internet connection (used for public holidays and cafeteria menu)
+
 ## Run
 
 ```bash
@@ -12,7 +17,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The first run creates `data/nova.db` automatically.
+Run the command from the project root directory. The first run creates `data/nova.db` automatically.
 
 ## Main Files
 
