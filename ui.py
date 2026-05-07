@@ -678,6 +678,13 @@ button[kind="primaryFormSubmit"] *,
         flex-direction: column;
     }
 }
+
+/* Prevent multiselect tag container from clipping the first chip */
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div:first-child {
+    flex-wrap: wrap;
+    overflow: visible !important;
+    padding-left: 6px;
+}
 </style>
 """
 
