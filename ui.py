@@ -697,13 +697,18 @@ _MULTISELECT_FIX_JS = """
           d.style.setProperty('flex-wrap', 'wrap', 'important');
         }
       });
-      // Move the search input to the end so it never sits before Monday
+      // Move the search input out of flow and make it invisible
       var inp = ms.querySelector('input[type="text"]');
       if (inp && inp.parentNode) {
         inp.parentNode.appendChild(inp);
-        inp.style.setProperty('min-width', '2px', 'important');
-        inp.style.setProperty('width', '2px', 'important');
+        inp.style.setProperty('position', 'absolute', 'important');
+        inp.style.setProperty('opacity', '0', 'important');
+        inp.style.setProperty('width', '1px', 'important');
+        inp.style.setProperty('height', '1px', 'important');
+        inp.style.setProperty('min-width', '0', 'important');
         inp.style.setProperty('padding', '0', 'important');
+        inp.style.setProperty('border', 'none', 'important');
+        inp.style.setProperty('outline', 'none', 'important');
       }
       // Make sure the first tag has enough left breathing room
       var firstTag = ms.querySelector('[data-baseweb="tag"]');
