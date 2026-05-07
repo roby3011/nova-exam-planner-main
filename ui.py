@@ -79,13 +79,19 @@ code {
     font-weight: 700;
 }
 
-[data-testid="stAlert"],
-[data-testid="stAlertContainer"],
-div[role="alert"] {
+[data-testid="stAlert"] {
     background: var(--soft-2) !important;
     border: 1.5px solid var(--line) !important;
     border-radius: 14px !important;
     color: var(--ink) !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stAlertContainer"],
+div[role="alert"] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
 }
 
