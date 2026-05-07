@@ -124,15 +124,14 @@ div[role="alert"] svg {
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
 
-/* ── Number inputs: the ± buttons are siblings of [data-baseweb="input"].
-   Target the direct child wrapper that is not the label (stWidgetLabel). */
-[data-testid="stNumberInput"] > div:not([data-testid]) {
+/* ── Number inputs: same treatment as date/text inputs ── */
+[data-testid="stNumberInput"] [data-baseweb="input"] {
     background: #ffffff !important;
     border: 1.5px solid rgba(17,17,17,0.2) !important;
     border-radius: 14px !important;
     overflow: hidden;
 }
-[data-testid="stNumberInput"] > div:not([data-testid]):focus-within {
+[data-testid="stNumberInput"] [data-baseweb="input"]:focus-within {
     border-color: rgba(17,17,17,0.32) !important;
     box-shadow: 0 0 0 3px rgba(17,17,17,0.08) !important;
 }
@@ -195,13 +194,15 @@ textarea::placeholder {
 }
 
 .stButton > button,
-[data-testid="stFormSubmitButton"] button {
-    border: 1.5px solid var(--line);
-    border-radius: 14px;
-    background: var(--panel);
-    color: var(--ink);
-    font-weight: 700;
-    box-shadow: 0 8px 18px rgba(17, 17, 17, 0.05);
+[data-testid="stFormSubmitButton"] button,
+[data-testid="stBaseButton-secondary"],
+[data-testid="stBaseButton-secondaryFormSubmit"] {
+    border: 1.5px solid var(--line) !important;
+    border-radius: 14px !important;
+    background: var(--panel) !important;
+    color: var(--ink) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 8px 18px rgba(17, 17, 17, 0.05) !important;
 }
 
 .stButton > button:hover,
