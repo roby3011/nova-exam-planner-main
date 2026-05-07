@@ -679,29 +679,14 @@ button[kind="primaryFormSubmit"] *,
     }
 }
 
-/* Make multiselect tags wrap and add padding so border-radius
-   doesn't clip the first chip */
-[data-testid="stMultiSelect"] [data-baseweb="select"],
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div,
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div > div {
-    height: auto !important;
-    min-height: unset !important;
+/* Make multiselect tags wrap and add margin so the container's
+   border-radius doesn't clip the first chip */
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
     flex-wrap: wrap !important;
-    overflow: visible !important;
+    height: auto !important;
 }
 [data-testid="stMultiSelect"] [data-baseweb="tag"] {
     margin-left: 4px !important;
-}
-/* Hide any scroll-arrow buttons baseweb injects */
-[data-testid="stMultiSelect"] [data-baseweb="select"] button,
-[data-testid="stMultiSelect"] [data-baseweb="select"] [role="button"] {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
 }
 </style>
 """
