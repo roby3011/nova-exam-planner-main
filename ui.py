@@ -539,26 +539,26 @@ button[kind="primaryFormSubmit"] *,
     font-weight: 900;
 }
 
-/* Fix expander content contrast */
-[data-testid="stExpander"] {
+/* Expander */
+[data-testid="stExpander"] details {
     background: var(--panel) !important;
     border: 1.5px solid var(--line) !important;
     border-radius: 14px !important;
     overflow: hidden;
 }
 
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary * {
+[data-testid="stExpander"] details summary,
+[data-testid="stExpander"] details summary * {
     background: var(--panel) !important;
     color: var(--ink) !important;
 }
 
-[data-testid="stExpander"] > div:last-child {
+[data-testid="stExpander"] details > div {
     background: var(--panel) !important;
     color: var(--ink) !important;
 }
 
-[data-testid="stExpander"] > div:last-child * {
+[data-testid="stExpander"] details > div * {
     color: var(--ink) !important;
 }
 
