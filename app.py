@@ -1197,20 +1197,31 @@ def page_customize(user: dict):
         ].rename(columns={"session_date": "date"}).copy()
         edit_df["planned_minutes"] = edit_df["planned_minutes"].astype(int)
         edit_df["completed_minutes"] = edit_df["completed_minutes"].astype(int)
+        edit_df["day"] = pd.to_datetime(edit_df["date"]).dt.strftime("%a")
+        edit_df["progress"] = (
+            (edit_df["completed_minutes"] /
+             edit_df["planned_minutes"].replace(0, 1)) * 100
+        ).clip(0, 100).round(0)
 
         edited = st.data_editor(
             edit_df,
+            column_order=["day", "date", "course_name",
+                          "planned_minutes", "completed_minutes", "progress"],
             column_config={
-                "id": st.column_config.NumberColumn(
-                    "ID", disabled=True, width="small"),
-                "date": st.column_config.DateColumn("Date", disabled=True),
+                "day": st.column_config.TextColumn(
+                    "Day", disabled=True, width="small"),
+                "date": st.column_config.DateColumn(
+                    "Date", disabled=True, width="small"),
                 "course_name": st.column_config.TextColumn(
                     "Course", disabled=True),
                 "planned_minutes": st.column_config.NumberColumn(
-                    "Planned min", min_value=0, max_value=600, step=5,
+                    "Planned", min_value=0, max_value=600, step=5,
+                    format="%d min",
                     help="Edit this column — multiples of 5 work best."),
                 "completed_minutes": st.column_config.NumberColumn(
-                    "Done min", disabled=True),
+                    "Done", disabled=True, format="%d min"),
+                "progress": st.column_config.ProgressColumn(
+                    "Progress", min_value=0, max_value=100, format="%.0f%%"),
             },
             use_container_width=True,
             hide_index=True,
