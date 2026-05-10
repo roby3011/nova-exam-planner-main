@@ -86,7 +86,29 @@ def generate_study_plan(courses: list[dict], *,
     if not courses:
         return []
 
-    preferred = set(preferred_days)
+    preferred = set(preferred_days) or set(DAY_NAMES)
+    if not preferred:
+        raise ValueError("preferred_days must contain at least one day")
+    max_hours_per_day = max(1, int(max_hours_per_day))
+    if weekly_hours is not None:
+        weekly_hours = max(1.0, float(weekly_hours))
+    if not isinstance(start_date, dt.date):
+        raise TypeError(f"start_date must be a datetime.date, got {type(start_date)}")
+
+    valid_courses = []
+    for c in courses:
+        if float(c.get("estimated_hours", 0)) <= 0:
+            continue
+        exam_d = c.get("exam_date")
+        if isinstance(exam_d, str):
+            exam_d = dt.date.fromisoformat(exam_d)
+        if exam_d <= start_date:
+            continue
+        valid_courses.append(c)
+    if not valid_courses:
+        return []
+    courses = valid_courses
+
     max_daily = max_hours_per_day * 60
     max_weekly = weekly_hours * 60 if weekly_hours else None
     exclude = set(exclude_dates) if exclude_dates else set()
