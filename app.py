@@ -26,6 +26,9 @@ from ui import (
 )
 from scheduler import (
     DAY_NAMES,
+    _available_days,
+    _floor_to_5,
+    _week_start,
     compute_analytics,
     generate_study_plan,
     rebalance_course_sessions,
@@ -40,7 +43,7 @@ def _bust_cache() -> None:
     sessions_as_df.clear()
     _list_courses.clear()
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)
 def _list_courses(user_id: int, data_version: int = 0) -> list[dict]:
     return db.list_courses(user_id)
 
@@ -107,7 +110,7 @@ def apply_pending_page_choice(page_names: list[str]) -> None:
         st.session_state["page_choice"] = pending
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)
 def sessions_as_df(user_id: int, data_version: int = 0) -> pd.DataFrame:
     sessions = db.list_sessions(user_id)
     if not sessions:
@@ -162,25 +165,6 @@ def missed_sessions_df(sessions_df: pd.DataFrame,
     ).clip(lower=0).astype(int)
     return missed[missed["missed_minutes"] > 0]
 
-
-def _week_start(day: dt.date) -> dt.date:
-    return day - dt.timedelta(days=day.weekday())
-
-
-def _floor_to_5(minutes: float) -> int:
-    return max(0, int(minutes // 5) * 5)
-
-
-def _reschedule_days(start: dt.date, end: dt.date,
-                     preferred_days: list[str],
-                     exclude_dates: set[dt.date]) -> list[dt.date]:
-    out, cur = [], start
-    preferred = set(preferred_days or DAY_NAMES)
-    while cur < end:
-        if DAY_NAMES[cur.weekday()] in preferred and cur not in exclude_dates:
-            out.append(cur)
-        cur += dt.timedelta(days=1)
-    return out
 
 
 def redistribute_missed_sessions(user: dict,
@@ -246,8 +230,9 @@ def redistribute_missed_sessions(user: dict,
             continue
 
         remaining = minutes
-        days = _reschedule_days(
-            today, course["exam_date"], preferred_days, exclude)
+        days = _available_days(
+            today, course["exam_date"],
+            set(preferred_days or DAY_NAMES), exclude)
         for day in days:
             if remaining < 5:
                 break
@@ -1915,28 +1900,85 @@ def page_export(user: dict):
         "Choose a CSV file", type=["csv"], label_visibility="collapsed")
     if uploaded:
         try:
-            df = pd.read_csv(uploaded, parse_dates=["exam_date"])
-            existing_by_name = {c["name"]: c for c in _list_courses(user["id"], data_version=_data_v())}
-            imported = 0
-            for _, r in df.iterrows():
-                exam_d = r["exam_date"]
-                if hasattr(exam_d, "date"):
-                    exam_d = exam_d.date()
-                existing = existing_by_name.get(str(r["name"]))
-                db.upsert_course(
-                    user["id"],
-                    name=str(r["name"]).strip(),
-                    exam_date=exam_d,
-                    ects=float(r["ects"]),
-                    difficulty=int(r["difficulty"]),
-                    estimated_hours=float(r["estimated_hours"]),
-                    course_id=existing["id"] if existing else None,
-                )
-                imported += 1
-            _bust_cache()
-            st.success(f"Imported/updated {imported} courses.")
+            df = pd.read_csv(uploaded)
+            required_cols = {"name", "exam_date", "ects", "difficulty", "estimated_hours"}
+            missing = required_cols - set(df.columns.str.lower())
+            if missing:
+                st.error(f"CSV is missing required columns: {', '.join(sorted(missing))}")
+            else:
+                df.columns = df.columns.str.lower()
+                existing_by_name = {
+                    c["name"]: c
+                    for c in _list_courses(user["id"], data_version=_data_v())
+                }
+                imported, skipped = 0, 0
+                errors = []
+                for idx, r in df.iterrows():
+                    try:
+                        name = str(r["name"]).strip()
+                        if not name:
+                            skipped += 1
+                            continue
+                        exam_d = pd.to_datetime(r["exam_date"]).date()
+                        ects = float(r["ects"])
+                        difficulty = int(float(r["difficulty"]))
+                        est_hours = float(r["estimated_hours"])
+                        if not (1 <= difficulty <= 5):
+                            raise ValueError(f"difficulty must be 1-5, got {difficulty}")
+                        if ects <= 0 or est_hours < 0:
+                            raise ValueError("ects must be > 0 and estimated_hours ≥ 0")
+                        existing = existing_by_name.get(name)
+                        db.upsert_course(
+                            user["id"],
+                            name=name,
+                            exam_date=exam_d,
+                            ects=ects,
+                            difficulty=difficulty,
+                            estimated_hours=est_hours,
+                            course_id=existing["id"] if existing else None,
+                        )
+                        imported += 1
+                    except Exception as row_err:
+                        errors.append(f"Row {idx + 2}: {row_err}")
+                _bust_cache()
+                if imported:
+                    st.success(f"Imported/updated {imported} course{'s' if imported != 1 else ''}.")
+                if skipped:
+                    st.warning(f"Skipped {skipped} row{'s' if skipped != 1 else ''} with no name.")
+                for err in errors[:5]:
+                    st.error(err)
         except Exception as e:
             st.error(f"Import failed: {e}")
+
+
+def _ics_escape(text: str) -> str:
+    """Escape text for use in an ICS property value (RFC 5545 §3.3.11)."""
+    return (
+        str(text)
+        .replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\n", "\\n")
+        .replace("\r", "")
+    )
+
+
+def _ics_fold(line: str) -> str:
+    """Fold a long ICS line to ≤75 octets (RFC 5545 §3.1)."""
+    encoded = line.encode("utf-8")
+    if len(encoded) <= 75:
+        return line
+    result, pos = [], 0
+    while pos < len(encoded):
+        chunk = encoded[pos:pos + 75]
+        # Don't split a multi-byte UTF-8 sequence.
+        while len(chunk) > 1 and (chunk[-1] & 0xC0) == 0x80:
+            chunk = chunk[:-1]
+        result.append(chunk.decode("utf-8"))
+        pos += len(chunk)
+        if pos < len(encoded):
+            result.append("\r\n ")
+    return "".join(result)
 
 
 def _build_ics(sessions_df: pd.DataFrame, courses: list[dict],
@@ -1945,10 +1987,10 @@ def _build_ics(sessions_df: pd.DataFrame, courses: list[dict],
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        f"PRODID:-//Nova Exam Planner//{user['username']}//EN",
+        f"PRODID:-//Nova Exam Planner//{_ics_escape(user['username'])}//EN",
         "CALSCALE:GREGORIAN",
     ]
-    now = dt.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
     for _, r in sessions_df.iterrows():
         d = r["session_date"]
@@ -1962,10 +2004,8 @@ def _build_ics(sessions_df: pd.DataFrame, courses: list[dict],
             f"DTSTAMP:{now}",
             f"DTSTART;VALUE=DATE:{ds}",
             f"DTEND;VALUE=DATE:{dnext}",
-            f"SUMMARY:Study: {r['course_name']} "
-            f"({duration_h:.1f}h)",
-            f"DESCRIPTION:Planned {int(r['planned_minutes'])} min "
-            f"via Nova Exam Planner.",
+            _ics_fold(f"SUMMARY:Study: {_ics_escape(r['course_name'])} ({duration_h:.1f}h)"),
+            _ics_fold(f"DESCRIPTION:Planned {int(r['planned_minutes'])} min via Nova Exam Planner."),
             "END:VEVENT",
         ]
 
@@ -1978,7 +2018,7 @@ def _build_ics(sessions_df: pd.DataFrame, courses: list[dict],
             f"DTSTAMP:{now}",
             f"DTSTART;VALUE=DATE:{ds}",
             f"DTEND;VALUE=DATE:{dnext}",
-            f"SUMMARY:Exam: {c['name']}",
+            _ics_fold(f"SUMMARY:Exam: {_ics_escape(c['name'])}"),
             "END:VEVENT",
         ]
 

@@ -154,15 +154,22 @@ def _build_weekly_sections_from_text(day_text: str) -> list[dict]:
     return sections
 
 
+_MAX_MENU_HTML_BYTES = 2 * 1024 * 1024  # 2 MB ceiling for regex safety
+
+
 def _fetch_weekly_menu_from_page() -> dict:
     source_url = _current_week_page_url()
     response = requests.get(source_url, timeout=_CAFETERIA_TIMEOUT)
     response.raise_for_status()
 
+    raw = response.text
+    if len(raw.encode("utf-8")) > _MAX_MENU_HTML_BYTES:
+        raise ValueError("Menu page response too large to parse safely")
+
     html = re.sub(
         r"<script\b[^>]*>.*?</script>",
         " ",
-        response.text,
+        raw,
         flags=re.IGNORECASE | re.DOTALL,
     )
     html = re.sub(
@@ -300,12 +307,17 @@ def get_weekly_cafeteria_menu() -> dict:
         }
 
 
+_COUNTRY_CODE_RE = re.compile(r"^[A-Za-z]{2}$")
+
+
 @st.cache_data(ttl=86_400, show_spinner=False)
 def fetch_public_holidays(country_code: str, year: int) -> list[dict]:
     """Fetch one country's holidays for a year."""
+    if not _COUNTRY_CODE_RE.match(country_code or ""):
+        return []
     try:
         r = requests.get(
-            HOLIDAYS_URL.format(year=year, country=country_code.upper()),
+            HOLIDAYS_URL.format(year=int(year), country=country_code.upper()),
             timeout=_REQUEST_TIMEOUT,
         )
         if r.ok:

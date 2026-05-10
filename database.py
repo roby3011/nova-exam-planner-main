@@ -360,7 +360,7 @@ def clear_user_data(user_id: int):
 
 
 def create_user_session(user_id: int, token: str, days: int = 30):
-    expires = (dt.datetime.utcnow() + dt.timedelta(days=days)).isoformat()
+    expires = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=days)).isoformat()
     with get_connection() as conn:
         conn.execute(
             "INSERT INTO user_sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
