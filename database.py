@@ -79,8 +79,8 @@ def init_db():
                 user_id           INTEGER NOT NULL,
                 course_id         INTEGER NOT NULL,
                 session_date      DATE NOT NULL,
-                planned_minutes   INTEGER NOT NULL,
-                completed_minutes INTEGER DEFAULT 0,
+                planned_minutes   INTEGER NOT NULL CHECK (planned_minutes >= 0),
+                completed_minutes INTEGER DEFAULT 0 CHECK (completed_minutes >= 0),
                 FOREIGN KEY (user_id)   REFERENCES users(id)   ON DELETE CASCADE,
                 FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
             );
@@ -134,6 +134,9 @@ def get_user_by_id(user_id: int) -> Optional[dict]:
         return dict(row) if row else None
 
 
+_PROFILE_COLUMNS = frozenset({"display_name", "email", "country_code"})
+
+
 def update_user_profile(user_id: int, *, display_name: Optional[str] = None,
                         email: Optional[str] = None,
                         country_code: Optional[str] = None):
@@ -142,6 +145,8 @@ def update_user_profile(user_id: int, *, display_name: Optional[str] = None,
                      ("email", email),
                      ("country_code", country_code)):
         if val is not None:
+            if col not in _PROFILE_COLUMNS:
+                raise ValueError(f"Invalid profile column: {col!r}")
             sets.append(f"{col} = ?")
             params.append(val)
     if not sets:

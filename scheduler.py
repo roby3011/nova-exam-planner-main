@@ -10,6 +10,8 @@ DAY_NAMES = [
     "Friday", "Saturday", "Sunday",
 ]
 
+MIN_SESSION_MINUTES = 5  # scheduling granularity
+
 
 def _available_days(start: dt.date, end: dt.date,
                     preferred: set[str],
@@ -30,8 +32,8 @@ def _week_start(day: dt.date) -> dt.date:
 
 
 def _floor_to_5(minutes: float) -> int:
-    """Round down to the nearest 5-minute block."""
-    return max(0, int(minutes // 5) * 5)
+    """Round down to the nearest MIN_SESSION_MINUTES block."""
+    return max(0, int(minutes // MIN_SESSION_MINUTES) * MIN_SESSION_MINUTES)
 
 
 def _trim_items_to_cap(items: dict, cap: float) -> dict:
@@ -52,11 +54,11 @@ def _trim_items_to_cap(items: dict, cap: float) -> dict:
         reverse=True,
     )
     for key in candidates:
-        if spare < 5:
+        if spare < MIN_SESSION_MINUTES:
             break
-        if trimmed[key] + 5 <= items[key]:
-            trimmed[key] += 5
-            spare -= 5
+        if trimmed[key] + MIN_SESSION_MINUTES <= items[key]:
+            trimmed[key] += MIN_SESSION_MINUTES
+            spare -= MIN_SESSION_MINUTES
 
     return trimmed
 
@@ -125,8 +127,8 @@ def generate_study_plan(courses: list[dict], *,
             continue
         daily = total / len(avail)
         daily = round(daily / 5) * 5
-        if daily < 5 and total >= 5:
-            daily = 5
+        if daily < MIN_SESSION_MINUTES and total >= MIN_SESSION_MINUTES:
+            daily = MIN_SESSION_MINUTES
         course_allocs[c["id"]] = {
             "name": c["name"],
             "exam_date": exam_d,
@@ -138,13 +140,13 @@ def generate_study_plan(courses: list[dict], *,
     overflow = {cid: 0 for cid in course_allocs}
 
     for day in all_days:
-        items = {cid: v["alloc"][day] for cid, v in course_allocs.items()
-                 if v["alloc"].get(day, 0) > 0}
-        day_total = sum(items.values())
+        daily_items = {cid: v["alloc"][day] for cid, v in course_allocs.items()
+                       if v["alloc"].get(day, 0) > 0}
+        day_total = sum(daily_items.values())
         if day_total <= max_daily:
             continue
-        trimmed_items = _trim_items_to_cap(items, max_daily)
-        for cid, val in items.items():
+        trimmed_items = _trim_items_to_cap(daily_items, max_daily)
+        for cid, val in daily_items.items():
             trimmed = trimmed_items[cid]
             course_allocs[cid]["alloc"][day] = trimmed
             overflow[cid] += val - trimmed
@@ -152,17 +154,17 @@ def generate_study_plan(courses: list[dict], *,
     if max_weekly:
         all_weeks = sorted({_week_start(day) for day in all_days})
         for week in all_weeks:
-            items = {
+            weekly_items = {
                 (cid, day): mins
                 for cid, v in course_allocs.items()
                 for day, mins in v["alloc"].items()
                 if _week_start(day) == week and mins > 0
             }
-            week_total = sum(items.values())
+            week_total = sum(weekly_items.values())
             if week_total <= max_weekly:
                 continue
-            trimmed_items = _trim_items_to_cap(items, max_weekly)
-            for (cid, day), val in items.items():
+            trimmed_items = _trim_items_to_cap(weekly_items, max_weekly)
+            for (cid, day), val in weekly_items.items():
                 trimmed = trimmed_items[(cid, day)]
                 course_allocs[cid]["alloc"][day] = trimmed
                 overflow[cid] += val - trimmed

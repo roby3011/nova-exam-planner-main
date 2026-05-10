@@ -59,6 +59,8 @@ COURSE_COLORS = [
     "#222222", "#444444", "#666666", "#888888", "#aaaaaa",
 ]
 
+UPCOMING_EXAM_DAYS = 21   # dashboard "upcoming exams" window
+
 
 def estimate_hours(ects: float, difficulty: int) -> float:
     return round(ects * (1.5 + 0.5 * difficulty), 1)
@@ -471,7 +473,7 @@ def page_dashboard(user: dict):
     k2.metric("Planned", fmt_minutes(total_planned), delta="​", delta_color="off")
     k3.metric("Completed", f"{pct:.0f}%", fmt_minutes(total_completed))
     if next_exam:
-        days = (next_exam["exam_date"] - dt.date.today()).days
+        days = max(0, (next_exam["exam_date"] - dt.date.today()).days)
         k4.metric("Next exam",
                   f"{days} day{'s' if days != 1 else ''}",
                   next_exam["name"])
@@ -503,7 +505,7 @@ def page_dashboard(user: dict):
 
     st.subheader("Upcoming Exams")
     upcoming = [c for c in courses
-                if 0 <= (c["exam_date"] - today).days <= 21]
+                if 0 <= (c["exam_date"] - today).days <= UPCOMING_EXAM_DAYS]
     upcoming.sort(key=lambda c: c["exam_date"])
     if not upcoming:
         st.caption("No exams in the next three weeks.")
@@ -924,8 +926,14 @@ def page_courses(user: dict):
                 end = max((c["exam_date"] for c in courses),
                           default=start_date)
                 years = list(range(start_date.year, end.year + 1))
-                exclude = api.get_holiday_dates(
-                    user["country_code"], years)
+                try:
+                    exclude = api.get_holiday_dates(
+                        user["country_code"], years)
+                except Exception:
+                    st.warning(
+                        "Could not fetch public holidays — proceeding "
+                        "without them."
+                    )
 
             sessions = generate_study_plan(
                 courses,
@@ -1290,6 +1298,11 @@ def page_customize(user: dict):
                 st.rerun()
 
 
+@st.cache_data(ttl=300, show_spinner=False)
+def _cached_analytics(user_id: int, data_version: int = 0) -> dict:
+    return compute_analytics(sessions_as_df(user_id, data_version))
+
+
 _ANALYTICS_PALETTE = [
     "#2563eb", "#7c3aed", "#059669", "#d97706", "#dc2626",
     "#0891b2", "#65a30d", "#c026d3", "#ea580c", "#0284c7",
@@ -1316,7 +1329,7 @@ def page_analytics(user: dict):
         st.info("Generate a plan first to see analytics.")
         return
 
-    a = compute_analytics(sessions_df)
+    a = _cached_analytics(user["id"], data_version=_data_v())
     con = db.get_constraints(user["id"])
 
     k1, k2, k3, k4 = st.columns(4)
@@ -1564,9 +1577,20 @@ def page_study_mode(user: dict):
             else f"Log 1 focus block ({fmt_minutes(focus_min)}) — extra"
         )
         if st.button(block_label, type="primary", use_container_width=True):
+            was_complete = (
+                target["kind"] == "session"
+                and target["completed_minutes"] >= target["planned_minutes"]
+            )
             logged = log_study_minutes(user["id"], target, int(focus_min))
             if logged > 0:
-                st.toast(f"Logged {fmt_minutes(logged)} for {target['course_name']}.")
+                if was_complete:
+                    st.toast(
+                        f"Session extended by {fmt_minutes(logged)} "
+                        f"for {target['course_name']} — both planned and "
+                        "completed updated."
+                    )
+                else:
+                    st.toast(f"Logged {fmt_minutes(logged)} for {target['course_name']}.")
             else:
                 st.toast("Nothing to log — session already at 0 minutes.")
             _bust_cache()
@@ -1813,13 +1837,28 @@ def page_profile(user: dict):
 
     with st.expander("Danger zone"):
         st.caption(
-            "Wipe all your courses, sessions, and generated plan.  "
+            "Wipe all your courses, sessions, and generated plan. "
             "Your account and settings are kept.")
-        if st.button("Clear my study data", type="secondary"):
-            db.clear_user_data(user["id"])
-            st.toast("All courses and sessions deleted.")
-            _bust_cache()
-            st.rerun()
+        if not st.session_state.get("_confirm_clear"):
+            if st.button("Clear my study data", type="secondary"):
+                st.session_state["_confirm_clear"] = True
+                st.rerun()
+        else:
+            st.warning(
+                "This will permanently delete all your courses and sessions. "
+                "This cannot be undone."
+            )
+            c1, c2 = st.columns(2)
+            if c1.button("Yes, delete everything", type="primary",
+                         use_container_width=True):
+                db.clear_user_data(user["id"])
+                st.session_state.pop("_confirm_clear", None)
+                st.toast("All courses and sessions deleted.")
+                _bust_cache()
+                st.rerun()
+            if c2.button("Cancel", use_container_width=True):
+                st.session_state.pop("_confirm_clear", None)
+                st.rerun()
 
 
 def page_export(user: dict):
@@ -1920,6 +1959,10 @@ def page_export(user: dict):
                             skipped += 1
                             continue
                         exam_d = pd.to_datetime(r["exam_date"]).date()
+                        if exam_d <= dt.date.today():
+                            raise ValueError(
+                                f"exam_date must be in the future, got {exam_d}"
+                            )
                         ects = float(r["ects"])
                         difficulty = int(float(r["difficulty"]))
                         est_hours = float(r["estimated_hours"])
